@@ -1,0 +1,2741 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Cutline . motorsport.com</title>
+<meta name="description" content="The Cutline. Call the NASCAR playoff cuts and crown the champion. A daily game from motorsport.com.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* src/styles/tokens.css */
+/* ============================================================
+   THE CUTLINE . design tokens
+   ------------------------------------------------------------
+   Inherited exactly from Two Seats so The Cutline reads as part
+   of the same family. Do not retune these here. The signature
+   element is the cutline itself; everything else stays quiet.
+   ============================================================ */
+
+:root {
+  --bg: #0d1117;
+  --panel: #161c24;
+  --panel2: #1d2530;
+  --raised: #222c38;
+  --line: #28323f;
+  --line2: #34404f;
+  --text: #eef2f6;
+  --muted: #8a97a8;
+  --faint: #5c6776;
+  --amber: #f2e500;
+  --amber2: #fff44d;
+  --green: #37d99a;
+  --red: #ff5d6c;
+  --cyan: #3fd8e2;
+  --hot: #ff7a3c;
+
+  --disp: "Barlow Condensed", "Arial Narrow", system-ui, sans-serif;
+  --body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --wrap: 680px;
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 16px;
+
+  --ease: cubic-bezier(.4, 0, .2, 1);
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  color: var(--text);
+  background: var(--bg);
+  font-family: var(--body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+button { font-family: inherit; }
+
+:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+::selection { background: rgba(242, 229, 0, .25); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.visually-quiet { color: var(--muted); }
+
+
+/* src/styles/app.css */
+/* ============================================================
+   THE CUTLINE . app chrome
+   ------------------------------------------------------------
+   Everything around the bracket: brand head, mode metarow,
+   modals, toast, result cards, the ad slot, the related games
+   rail, and the footer. Quiet by design so the bracket leads.
+   ============================================================ */
+
+.checker {
+  height: 10px;
+  width: 100%;
+  background-image:
+    linear-gradient(45deg, #11161d 25%, transparent 25%),
+    linear-gradient(-45deg, #11161d 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #11161d 75%),
+    linear-gradient(-45deg, transparent 75%, #11161d 75%);
+  background-size: 16px 16px;
+  background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+  background-color: var(--panel);
+  border-bottom: 1px solid var(--line);
+}
+
+.wrap { max-width: var(--wrap); margin: 0 auto; padding: 0 16px; }
+
+/* ---- brand head ---- */
+.head { padding: 22px 0 6px; }
+.presents { font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+.presents .logo-img { height: 17px; width: auto; display: inline-block; vertical-align: middle; }
+.presents .logo-img--foot { height: 15px; opacity: .9; }
+
+h1.logo {
+  margin: 14px 0 0;
+  font-family: var(--disp);
+  font-weight: 700;
+  font-size: 54px;
+  line-height: .9;
+  text-transform: uppercase;
+  letter-spacing: .01em;
+}
+h1.logo em { font-style: normal; color: var(--amber); }
+
+.tagline {
+  font-family: var(--disp);
+  font-weight: 500;
+  font-size: 17px;
+  letter-spacing: .03em;
+  text-transform: uppercase;
+  margin-top: 14px;
+  color: var(--text);
+}
+.kick {
+  font-family: var(--disp);
+  font-size: 11px;
+  letter-spacing: .26em;
+  color: var(--amber);
+  text-transform: uppercase;
+  font-weight: 700;
+  margin-top: 12px;
+}
+
+/* ---- mode + meta row ---- */
+.metarow { display: flex; align-items: center; gap: 8px; margin: 18px 0 6px; flex-wrap: wrap; }
+.pill {
+  font-family: var(--disp);
+  font-size: 11.5px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 6px 11px;
+}
+.pill b { color: var(--amber2); }
+.pill.live { color: var(--bg); background: var(--red); border-color: var(--red); font-weight: 700; }
+.pill.live b { color: var(--bg); }
+
+.modeswitch { display: inline-flex; border: 1px solid var(--line); border-radius: 20px; overflow: hidden; }
+.modeswitch button {
+  font-family: var(--disp);
+  font-size: 11.5px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: none; border: 0;
+  padding: 6px 12px; cursor: pointer;
+}
+.modeswitch button[aria-pressed="true"] { background: var(--raised); color: var(--text); }
+
+.help {
+  margin-left: auto;
+  font-family: var(--disp);
+  font-size: 11.5px;
+  letter-spacing: .06em;
+  color: var(--muted);
+  background: none;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 7px 11px;
+  cursor: pointer;
+  text-transform: uppercase;
+}
+.help:hover { color: var(--text); border-color: var(--line2); }
+
+/* ---- brief strip ---- */
+.brief {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: 16px 18px;
+  margin: 12px 0 4px;
+}
+.brief .bl {
+  font-family: var(--disp);
+  font-size: 14px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--amber);
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.brief .byr { font-family: var(--disp); font-size: 30px; font-weight: 700; text-transform: uppercase; line-height: 1; }
+.brief .bsub { font-size: 13.5px; color: var(--muted); margin-top: 6px; line-height: 1.5; }
+.brief .flag {
+  display: inline-block; margin-top: 10px;
+  font-family: var(--disp); font-size: 11px; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--hot); border: 1px solid var(--hot); border-radius: 14px; padding: 3px 9px;
+}
+
+/* ---- primary action button ---- */
+.btn {
+  font-family: var(--disp);
+  font-weight: 700;
+  font-size: 17px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--bg);
+  background: var(--amber);
+  border: 0;
+  border-radius: var(--r-md);
+  padding: 14px 18px;
+  width: 100%;
+  cursor: pointer;
+  transition: filter .15s var(--ease), transform .05s var(--ease);
+}
+.btn:hover { filter: brightness(1.06); }
+.btn:active { transform: translateY(1px); }
+.btn:disabled { background: var(--raised); color: var(--faint); cursor: not-allowed; filter: none; }
+.btn.ghost { background: none; color: var(--text); border: 1px solid var(--line2); }
+.btn.ghost:hover { border-color: var(--cyan); color: var(--cyan); filter: none; }
+
+.actionbar { margin: 16px 0 4px; display: grid; gap: 10px; }
+.actionbar.two { grid-template-columns: 1fr 1fr; }
+
+/* ---- modal ---- */
+.modal-bg {
+  position: fixed; inset: 0;
+  background: rgba(6, 9, 13, .72);
+  display: flex; align-items: center; justify-content: center;
+  padding: 18px; z-index: 50;
+  opacity: 0; pointer-events: none; transition: opacity .2s var(--ease);
+}
+.modal-bg.show { opacity: 1; pointer-events: auto; }
+.mbox {
+  width: 100%; max-width: 460px;
+  background: var(--bg);
+  border: 1px solid var(--line2);
+  border-radius: var(--r-lg);
+  padding: 26px 24px;
+  max-height: 88vh; overflow-y: auto;
+}
+.mbox h2 {
+  font-family: var(--disp); font-weight: 700; text-transform: uppercase;
+  font-size: 26px; margin: 0 0 4px; letter-spacing: .01em;
+}
+.mbox p { color: var(--muted); font-size: 14px; line-height: 1.6; margin: 8px 0; }
+.mbox .rule { font-size: 14px; line-height: 1.55; margin: 10px 0; padding-left: 14px; border-left: 2px solid var(--line2); color: var(--text); }
+.mbox .rule b { color: var(--amber2); }
+.mclose { margin-top: 18px; }
+.mdismiss {
+  position: absolute; top: 14px; right: 16px;
+  background: none; border: 0; color: var(--muted);
+  font-size: 22px; cursor: pointer; line-height: 1;
+}
+.mbox { position: relative; }
+
+/* ---- toast ---- */
+.toast {
+  position: fixed; left: 50%; bottom: 26px; transform: translateX(-50%) translateY(20px);
+  background: var(--raised); border: 1px solid var(--line2);
+  color: var(--text); font-size: 13.5px;
+  padding: 11px 16px; border-radius: var(--r-md);
+  opacity: 0; pointer-events: none; transition: opacity .2s var(--ease), transform .2s var(--ease);
+  z-index: 60; max-width: 90vw; text-align: center;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ---- result / verdict ---- */
+.verdict {
+  background: var(--panel); border: 1px solid var(--line);
+  border-radius: var(--r-lg); padding: 20px; margin: 14px 0;
+  text-align: center;
+}
+.verdict .grade {
+  font-family: var(--disp); font-weight: 700; font-size: 64px; line-height: 1;
+}
+.verdict.good .grade { color: var(--green); }
+.verdict.mid .grade { color: var(--amber2); }
+.verdict.bad .grade { color: var(--red); }
+.verdict .glabel { font-family: var(--disp); text-transform: uppercase; letter-spacing: .14em; font-size: 15px; margin-top: 8px; }
+.verdict .ghead { color: var(--muted); font-size: 14px; margin-top: 6px; }
+.verdict .pct { color: var(--faint); font-size: 12.5px; margin-top: 10px; font-style: italic; }
+
+.scoreline { display: flex; gap: 10px; justify-content: center; margin-top: 14px; flex-wrap: wrap; }
+.scorebox { background: var(--panel2); border: 1px solid var(--line); border-radius: var(--r-md); padding: 10px 16px; min-width: 92px; }
+.scorebox .v { font-family: var(--disp); font-weight: 700; font-size: 26px; line-height: 1; }
+.scorebox .k { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; margin-top: 4px; }
+
+.roundbreak { margin: 14px 0; display: grid; gap: 8px; }
+.rbrow {
+  display: grid; grid-template-columns: 1fr auto auto; gap: 10px; align-items: center;
+  background: var(--panel); border: 1px solid var(--line); border-radius: var(--r-md); padding: 10px 14px;
+}
+.rbrow .rl { font-family: var(--disp); text-transform: uppercase; letter-spacing: .08em; font-size: 14px; }
+.rbrow .rh { font-size: 13px; color: var(--muted); }
+.rbrow .rn { font-family: var(--disp); font-weight: 700; font-size: 18px; }
+.rbrow.perfect { border-color: var(--green); }
+.rbrow .badge { font-size: 10.5px; text-transform: uppercase; letter-spacing: .1em; color: var(--green); }
+
+/* ---- archive ---- */
+.section-h {
+  font-family: var(--disp); font-weight: 700; text-transform: uppercase;
+  letter-spacing: .14em; font-size: 14px; color: var(--muted);
+  margin: 26px 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--line);
+}
+.arch-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+.arch-card {
+  background: var(--panel); border: 1px solid var(--line); border-radius: var(--r-md);
+  padding: 13px 14px; cursor: pointer; text-align: left;
+  transition: border-color .15s var(--ease), transform .05s var(--ease);
+}
+.arch-card:hover { border-color: var(--line2); }
+.arch-card:active { transform: translateY(1px); }
+.arch-card .ay { font-family: var(--disp); font-weight: 700; font-size: 24px; line-height: 1; }
+.arch-card .ac { font-size: 13px; color: var(--text); margin-top: 6px; }
+.arch-card .ac span { color: var(--muted); }
+.arch-card .atag {
+  display: inline-block; margin-top: 9px; font-family: var(--disp);
+  font-size: 10px; letter-spacing: .1em; text-transform: uppercase; padding: 2px 7px; border-radius: 10px;
+}
+.arch-card .atag.full { color: var(--green); border: 1px solid var(--green); }
+.arch-card .atag.part { color: var(--hot); border: 1px solid var(--hot); }
+.arch-card.locked { opacity: .92; }
+
+/* ---- ad slot ---- */
+.adslot {
+  margin: 22px 0; padding: 14px;
+  background: var(--panel); border: 1px dashed var(--line2); border-radius: var(--r-md);
+  text-align: center; min-height: 96px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+}
+.adslot .adk { font-family: var(--disp); font-size: 10px; letter-spacing: .22em; text-transform: uppercase; color: var(--faint); }
+.adslot .adm { font-size: 12.5px; color: var(--muted); }
+
+/* ---- related games rail ---- */
+.rail { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
+.railcard {
+  background: var(--panel); border: 1px solid var(--line); border-radius: var(--r-md);
+  padding: 14px; text-decoration: none; color: inherit; display: block;
+  transition: border-color .15s var(--ease);
+}
+.railcard:hover { border-color: var(--cyan); }
+.railcard .rg-k { font-family: var(--disp); font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--amber); }
+.railcard .rg-n { font-family: var(--disp); font-weight: 700; text-transform: uppercase; font-size: 19px; margin-top: 4px; }
+.railcard .rg-d { font-size: 12.5px; color: var(--muted); margin-top: 4px; line-height: 1.45; }
+
+/* ---- footer ---- */
+.foot {
+  margin: 30px 0 40px; padding-top: 16px; border-top: 1px solid var(--line);
+  color: var(--faint); font-size: 12px; line-height: 1.6;
+}
+.foot a { color: var(--muted); }
+
+.screen { display: none; }
+.screen.active { display: block; }
+
+@media (max-width: 460px) {
+  h1.logo { font-size: 44px; }
+  .actionbar.two { grid-template-columns: 1fr; }
+}
+
+
+/* src/styles/bracket.css */
+/* ============================================================
+   THE CUTLINE . the bracket (signature surface)
+   ------------------------------------------------------------
+   The bracket is the hero and the cutline is the one memorable
+   thing. While picking, drivers sit in a single column and a
+   literal amber line marks the cut. As a round resolves the line
+   tightens: survivors lift above it, the cut drops below.
+   Mobile first (one column, swipe round to round); the desktop
+   wide bracket is layered on at the bottom.
+   ============================================================ */
+
+/* ---- round stepper ---- */
+.stepper { display: flex; gap: 6px; margin: 14px 0 4px; }
+.step {
+  flex: 1; text-align: center;
+  font-family: var(--disp); font-size: 11px; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--faint); padding: 8px 4px; border-radius: var(--r-sm);
+  border: 1px solid var(--line); background: var(--panel);
+}
+.step.on { color: var(--bg); background: var(--amber); border-color: var(--amber); font-weight: 700; }
+.step.done { color: var(--green); border-color: var(--line2); }
+
+/* ---- round heading ---- */
+.round-head { margin: 16px 0 10px; }
+.round-head .rt { font-family: var(--disp); font-weight: 700; text-transform: uppercase; font-size: 28px; line-height: 1; }
+.round-head .rmeta { font-size: 13px; color: var(--muted); margin-top: 6px; line-height: 1.5; }
+.round-head .rprompt {
+  font-family: var(--disp); text-transform: uppercase; letter-spacing: .08em;
+  font-size: 13px; color: var(--amber2); margin-top: 8px;
+}
+.round-head .rcount { color: var(--muted); }
+
+/* ---- the cutline (signature) ---- */
+.cutboard { position: relative; margin: 6px 0 4px; }
+
+.cutline {
+  position: relative;
+  display: flex; align-items: center; gap: 10px;
+  margin: 10px 0; padding: 0 2px;
+  color: var(--amber);
+  font-family: var(--disp); font-weight: 700; text-transform: uppercase;
+  font-size: 12px; letter-spacing: .22em;
+}
+.cutline::before, .cutline::after {
+  content: ""; height: 2px; flex: 1;
+  background: repeating-linear-gradient(90deg, var(--amber) 0 9px, transparent 9px 16px);
+}
+.cutline .ctag { white-space: nowrap; }
+.cutline .ctight {
+  transition: opacity .3s var(--ease);
+  color: var(--muted); letter-spacing: .12em; font-size: 11px;
+}
+
+/* ---- driver row ---- */
+.drow {
+  display: grid; grid-template-columns: 26px 1fr auto;
+  align-items: center; gap: 10px;
+  background: var(--panel); border: 1px solid var(--line);
+  border-radius: var(--r-md); padding: 12px 13px; width: 100%;
+  cursor: pointer; text-align: left; color: var(--text);
+  transition: border-color .12s var(--ease), background .12s var(--ease), transform .04s var(--ease);
+}
+.drow + .drow { margin-top: 7px; }
+.drow:hover { border-color: var(--line2); }
+.drow:active { transform: translateY(1px); }
+.drow .seed { font-family: var(--disp); font-size: 13px; color: var(--faint); text-align: center; }
+.drow .nm { font-family: var(--disp); font-weight: 600; font-size: 18px; text-transform: uppercase; letter-spacing: .01em; }
+.drow .car { color: var(--faint); font-weight: 500; font-size: 13px; margin-left: 7px; }
+.drow .tick { font-size: 13px; color: var(--faint); transition: color .12s var(--ease); }
+.drow .tags { display: flex; gap: 5px; margin-top: 4px; flex-wrap: wrap; }
+.drow .tag {
+  font-size: 10px; letter-spacing: .04em; text-transform: uppercase;
+  color: var(--cyan); border: 1px solid var(--line2); border-radius: 10px; padding: 1px 7px;
+}
+.drow .cushion {
+  font-family: var(--disp); font-weight: 700; font-size: 13px; text-align: right; min-width: 54px;
+}
+.drow .cushion.pos { color: var(--green); }
+.drow .cushion.neg { color: var(--red); }
+.drow .cushion.lock { color: var(--amber2); }
+
+.drow.on { border-color: var(--amber); background: var(--panel2); }
+.drow.on .tick { color: var(--amber); }
+.drow.on .nm { color: var(--amber2); }
+
+.drow.crowned { border-color: var(--amber2); }
+.drow.crowned .tick { color: var(--amber2); }
+
+.drow:disabled { cursor: default; opacity: .55; }
+
+/* reveal states layered on the same row */
+.drow.r-hit { border-color: var(--green); }
+.drow.r-hit .tick { color: var(--green); }
+.drow.r-miss { border-color: var(--red); }
+.drow.r-miss .tick { color: var(--red); }
+.drow.r-upset { border-color: var(--cyan); }
+.drow .reveal-note {
+  font-size: 11.5px; color: var(--muted); margin-top: 3px;
+}
+.drow.r-hit .reveal-note { color: var(--green); }
+.drow.r-miss .reveal-note { color: var(--red); }
+.drow.r-upset .reveal-note { color: var(--cyan); }
+
+.colstack > div { min-width: 0; }
+
+/* ---- reveal sequence ---- */
+.reveal-round { margin: 18px 0; }
+.reveal-round .rrh {
+  display: flex; align-items: baseline; gap: 10px;
+  font-family: var(--disp); text-transform: uppercase; letter-spacing: .06em;
+  font-size: 18px; font-weight: 700; margin-bottom: 8px;
+}
+.reveal-round .rrh .rrs { font-size: 13px; color: var(--muted); font-weight: 500; letter-spacing: .04em; }
+.reveal-round .rrh .rrs.good { color: var(--green); }
+.reveal-round .rrh .rrs.bad { color: var(--red); }
+
+/* ---- share grid ---- */
+.sharebox {
+  background: var(--panel); border: 1px solid var(--line2);
+  border-radius: var(--r-md); padding: 16px; margin: 12px 0;
+}
+.sharegrid {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 16px; line-height: 1.5; white-space: pre; letter-spacing: 2px;
+  color: var(--text); text-align: center;
+}
+.sharecap { color: var(--muted); font-size: 12.5px; text-align: center; margin-top: 8px; }
+
+/* ============================================================
+   desktop wide bracket
+   ============================================================ */
+.wide-bracket { display: none; }
+
+@media (min-width: 900px) {
+  .wide-bracket {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr) .8fr;
+    gap: 14px; align-items: start;
+    margin: 18px 0;
+  }
+  .wb-col { display: flex; flex-direction: column; gap: 8px; }
+  .wb-col h4 {
+    font-family: var(--disp); text-transform: uppercase; letter-spacing: .1em;
+    font-size: 12px; color: var(--muted); margin: 0 0 4px; text-align: center;
+  }
+  .wb-cell {
+    background: var(--panel); border: 1px solid var(--line); border-radius: var(--r-sm);
+    padding: 8px 10px; font-family: var(--disp); font-size: 14px; text-transform: uppercase;
+    display: flex; justify-content: space-between; gap: 8px;
+  }
+  .wb-cell .wbseed { color: var(--faint); }
+  .wb-cell.adv { border-color: var(--green); }
+  .wb-cell.cut { opacity: .5; }
+  .wb-cell.champ { border-color: var(--amber2); color: var(--amber2); }
+  .wb-crown {
+    align-self: center; font-family: var(--disp); font-weight: 700; text-transform: uppercase;
+    color: var(--amber2); font-size: 16px; border: 1px solid var(--amber2);
+    border-radius: var(--r-sm); padding: 14px 10px; text-align: center;
+  }
+}
+
+/* keep the pick surface single column on small screens; this is the
+   intended mobile experience, not a fallback */
+@media (max-width: 899px) {
+  .wide-bracket { display: none; }
+}
+
+</style>
+</head>
+<body>
+<div id="the-cutline"></div>
+<script>window.CUTLINE_LOGO = "data:image/png;base64,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";</script>
+<script>
+/* The Cutline . motorsport.com . built 2026-06-19 */
+
+(function(){
+"use strict";
+
+/* ---- src/data/seasons.js ---- */
+/* ============================================================
+   THE CUTLINE . data layer (seasons)
+   ------------------------------------------------------------
+   The integrity core of the game. Every elimination, every
+   Championship 4 and every champion in here is checked against
+   official NASCAR results. Nothing in this file is invented.
+
+   Verification levels per round:
+     "official" : confirmed against official NASCAR results
+                  (cited in VERIFICATION.md), or logically pinned
+                  by directly sourced complementary sets.
+     "pending"  : not yet verified this pass. Held back from the
+                  scored daily and flagged in product. Replace
+                  from Motorsport Stats before promoting to
+                  "official".
+
+   The elimination format ran 2014 through 2025. 2025 was the
+   final season of it. NASCAR moved to a modified Chase for 2026,
+   so this archive is the complete elimination era: 12 seasons.
+
+   Driver record:
+     n    driver name
+     car  car number (badge only, never a competitive unit)
+     out  round the driver was eliminated in: 16 | 12 | 8,
+          or 4 if they reached the Championship 4
+     champ true for the title winner (exactly one per season)
+     seed playoff seed entering the playoffs (1 = top). Seeds are
+          display order only and never affect scoring. Where a
+          season is not seed verified they are approximate and the
+          bracket simply uses finishing depth, then car number.
+
+   Points and cushions are NOT stored as historical fact here.
+   The cutline math (reset rules, cushion computation) is real and
+   lives in engine/cutline.js, exercised on synthetic standings in
+   tests. Exact historical entering points get wired from the
+   Motorsport Stats feed at handoff (see SCHEMA.md).
+   ============================================================ */
+const DATA_VERSION = "2026.06.18-elim-era-v1";
+
+/* Which seasons are fully verified end to end (all three
+   elimination rounds plus Championship 4 plus champion). Only
+   these rotate through the scored daily. */
+const DAILY_POOL_YEARS = [2022, 2023, 2024, 2025];
+
+/* helper: build the 16 driver field from the four round buckets.
+   order within a bucket is the on track elimination order where
+   known, else by car number. */
+function field(buckets) {
+  const out = [];
+  const push = (arr, round) => arr.forEach(d => out.push({ ...d, out: round }));
+  push(buckets.champ4, 4);
+  push(buckets.ro8, 8);
+  push(buckets.ro12, 12);
+  push(buckets.ro16, 16);
+  return out;
+}
+const SEASONS = [
+  /* ---------------- 2025 (verified end to end) -------------- */
+  {
+    year: 2025,
+    finale: "Phoenix Raceway",
+    verify: { ro16: "official", ro12: "official", ro8: "official", champ4: "official", champion: "official" },
+    note: "Final season of the elimination format. Larson took the title on points, finishing third at Phoenix.",
+    drivers: field({
+      champ4: [
+        { n: "Kyle Larson", car: 5, seed: 3, champ: true },
+        { n: "Chase Briscoe", car: 19, seed: 1 },
+        { n: "Denny Hamlin", car: 11, seed: 2 },
+        { n: "William Byron", car: 24, seed: 4 },
+      ],
+      ro8: [
+        { n: "Ryan Blaney", car: 12, seed: 5 },
+        { n: "Christopher Bell", car: 20, seed: 6 },
+        { n: "Joey Logano", car: 22, seed: 7 },
+        { n: "Chase Elliott", car: 9, seed: 8 },
+      ],
+      ro12: [
+        { n: "Ross Chastain", car: 1, seed: 9 },
+        { n: "Bubba Wallace", car: 23, seed: 10 },
+        { n: "Tyler Reddick", car: 45, seed: 11 },
+        { n: "Austin Cindric", car: 2, seed: 12 },
+      ],
+      ro16: [
+        { n: "Alex Bowman", car: 48, seed: 13 },
+        { n: "Austin Dillon", car: 3, seed: 14 },
+        { n: "Shane van Gisbergen", car: 88, seed: 15 },
+        { n: "Josh Berry", car: 21, seed: 16 },
+      ],
+    }),
+  },
+
+  /* ---------------- 2024 (verified end to end) -------------- */
+  {
+    year: 2024,
+    finale: "Phoenix Raceway",
+    verify: { ro16: "official", ro12: "official", ro8: "official", champ4: "official", champion: "official" },
+    note: "Logano won his third title from 11th in full season points, the lowest ever for a champion.",
+    drivers: field({
+      champ4: [
+        { n: "Joey Logano", car: 22, seed: 6, champ: true },
+        { n: "Ryan Blaney", car: 12, seed: 4 },
+        { n: "William Byron", car: 24, seed: 2 },
+        { n: "Tyler Reddick", car: 45, seed: 1 },
+      ],
+      ro8: [
+        { n: "Kyle Larson", car: 5, seed: 3 },
+        { n: "Christopher Bell", car: 20, seed: 5 },
+        { n: "Denny Hamlin", car: 11, seed: 7 },
+        { n: "Chase Elliott", car: 9, seed: 8 },
+      ],
+      ro12: [
+        { n: "Alex Bowman", car: 48, seed: 9 },
+        { n: "Chase Briscoe", car: 14, seed: 10 },
+        { n: "Daniel Suarez", car: 99, seed: 11 },
+        { n: "Austin Cindric", car: 2, seed: 12 },
+      ],
+      ro16: [
+        { n: "Brad Keselowski", car: 6, seed: 13 },
+        { n: "Martin Truex Jr", car: 19, seed: 14 },
+        { n: "Harrison Burton", car: 21, seed: 16 },
+        { n: "Ty Gibbs", car: 54, seed: 15 },
+      ],
+    }),
+  },
+
+  /* ---------------- 2023 (verified end to end) -------------- */
+  {
+    year: 2023,
+    finale: "Phoenix Raceway",
+    verify: { ro16: "official", ro12: "official", ro8: "official", champ4: "official", champion: "official" },
+    note: "Blaney won his first title. Non playoff driver Ross Chastain won the finale.",
+    drivers: field({
+      champ4: [
+        { n: "Ryan Blaney", car: 12, seed: 5, champ: true },
+        { n: "William Byron", car: 24, seed: 1 },
+        { n: "Kyle Larson", car: 5, seed: 2 },
+        { n: "Christopher Bell", car: 20, seed: 4 },
+      ],
+      ro8: [
+        { n: "Martin Truex Jr", car: 19, seed: 3 },
+        { n: "Denny Hamlin", car: 11, seed: 6 },
+        { n: "Chris Buescher", car: 17, seed: 7 },
+        { n: "Tyler Reddick", car: 45, seed: 8 },
+      ],
+      ro12: [
+        { n: "Brad Keselowski", car: 6, seed: 9 },
+        { n: "Ross Chastain", car: 1, seed: 10 },
+        { n: "Bubba Wallace", car: 23, seed: 11 },
+        { n: "Kyle Busch", car: 8, seed: 12 },
+      ],
+      ro16: [
+        { n: "Joey Logano", car: 22, seed: 13 },
+        { n: "Kevin Harvick", car: 4, seed: 14 },
+        { n: "Ricky Stenhouse Jr", car: 47, seed: 15 },
+        { n: "Michael McDowell", car: 34, seed: 16 },
+      ],
+    }),
+  },
+
+  /* ---------------- 2022 (verified end to end) -------------- */
+  {
+    year: 2022,
+    finale: "Phoenix Raceway",
+    verify: { ro16: "official", ro12: "official", ro8: "official", champ4: "official", champion: "official" },
+    note: "Logano's second title. Defending champ Larson was cut in the Round of 12.",
+    drivers: field({
+      champ4: [
+        { n: "Joey Logano", car: 22, seed: 4, champ: true },
+        { n: "Ross Chastain", car: 1, seed: 3 },
+        { n: "Christopher Bell", car: 20, seed: 5 },
+        { n: "Chase Elliott", car: 9, seed: 1 },
+      ],
+      ro8: [
+        { n: "Denny Hamlin", car: 11, seed: 6 },
+        { n: "William Byron", car: 24, seed: 7 },
+        { n: "Ryan Blaney", car: 12, seed: 8 },
+        { n: "Chase Briscoe", car: 14, seed: 10 },
+      ],
+      ro12: [
+        { n: "Alex Bowman", car: 48, seed: 11 },
+        { n: "Kyle Larson", car: 5, seed: 2 },
+        { n: "Daniel Suarez", car: 99, seed: 12 },
+        { n: "Austin Cindric", car: 2, seed: 13 },
+      ],
+      ro16: [
+        { n: "Kyle Busch", car: 18, seed: 9 },
+        { n: "Tyler Reddick", car: 8, seed: 14 },
+        { n: "Kevin Harvick", car: 4, seed: 15 },
+        { n: "Austin Dillon", car: 3, seed: 16 },
+      ],
+    }),
+  },
+
+  /* ===========================================================
+     2014 through 2021. Champions and Championship 4 are verified.
+     Intermediate round cuts are PENDING the Motorsport Stats pass
+     and are held out of the scored daily. They are shown in the
+     archive with a clear "champion and finalists verified, earlier
+     rounds pending" badge, and earlier rounds are not scored.
+     The "out" round for non finalists below is a best ordering by
+     seed and is treated as unscored until verified.
+     =========================================================== */
+
+  {
+    year: 2021,
+    finale: "Phoenix Raceway",
+    verify: { ro16: "pending", ro12: "pending", ro8: "pending", champ4: "official", champion: "official" },
+    note: "Larson's first title in a dominant season. Earlier round cuts pending verification.",
+    drivers: field({
+      champ4: [
+        { n: "Kyle Larson", car: 5, seed: 1, champ: true },
+        { n: "Martin Truex Jr", car: 19, seed: 3 },
+        { n: "Denny Hamlin", car: 11, seed: 2 },
+        { n: "Chase Elliott", car: 9, seed: 4 },
+      ],
+      ro8: [
+        { n: "Kyle Busch", car: 18, seed: 6 },
+        { n: "Brad Keselowski", car: 2, seed: 7 },
+        { n: "Joey Logano", car: 22, seed: 5 },
+        { n: "Ryan Blaney", car: 12, seed: 8 },
+      ],
+      ro12: [
+        { n: "William Byron", car: 24, seed: 9 },
+        { n: "Alex Bowman", car: 48, seed: 10 },
+        { n: "Kevin Harvick", car: 4, seed: 11 },
+        { n: "Christopher Bell", car: 20, seed: 12 },
+      ],
+      ro16: [
+        { n: "Kurt Busch", car: 1, seed: 13 },
+        { n: "Michael McDowell", car: 34, seed: 16 },
+        { n: "Aric Almirola", car: 10, seed: 14 },
+        { n: "Tyler Reddick", car: 8, seed: 15 },
+      ],
+    }),
+  },
+  {
+    year: 2020,
+    finale: "Phoenix Raceway",
+    verify: { ro16: "pending", ro12: "pending", ro8: "pending", champ4: "official", champion: "official" },
+    note: "Elliott's title, the first championship decided at Phoenix. Harvick won 9 races but missed the final four.",
+    drivers: field({
+      champ4: [
+        { n: "Chase Elliott", car: 9, seed: 5, champ: true },
+        { n: "Joey Logano", car: 22, seed: 2 },
+        { n: "Denny Hamlin", car: 11, seed: 1 },
+        { n: "Brad Keselowski", car: 2, seed: 3 },
+      ],
+      ro8: [
+        { n: "Kevin Harvick", car: 4, seed: 4 },
+        { n: "Martin Truex Jr", car: 19, seed: 6 },
+        { n: "Kurt Busch", car: 1, seed: 8 },
+        { n: "Alex Bowman", car: 88, seed: 7 },
+      ],
+      ro12: [
+        { n: "Kyle Busch", car: 18, seed: 9 },
+        { n: "Aric Almirola", car: 10, seed: 10 },
+        { n: "Clint Bowyer", car: 14, seed: 11 },
+        { n: "Austin Dillon", car: 3, seed: 12 },
+      ],
+      ro16: [
+        { n: "Ryan Blaney", car: 12, seed: 13 },
+        { n: "William Byron", car: 24, seed: 14 },
+        { n: "Cole Custer", car: 41, seed: 16 },
+        { n: "Matt DiBenedetto", car: 21, seed: 15 },
+      ],
+    }),
+  },
+  {
+    year: 2019,
+    finale: "Homestead-Miami Speedway",
+    verify: { ro16: "pending", ro12: "pending", ro8: "pending", champ4: "official", champion: "official" },
+    note: "Kyle Busch's second title. Last championship decided at Homestead.",
+    drivers: field({
+      champ4: [
+        { n: "Kyle Busch", car: 18, seed: 4, champ: true },
+        { n: "Martin Truex Jr", car: 19, seed: 1 },
+        { n: "Denny Hamlin", car: 11, seed: 3 },
+        { n: "Kevin Harvick", car: 4, seed: 2 },
+      ],
+      ro8: [
+        { n: "Joey Logano", car: 22, seed: 5 },
+        { n: "Kyle Larson", car: 42, seed: 6 },
+        { n: "Chase Elliott", car: 9, seed: 7 },
+        { n: "Ryan Blaney", car: 12, seed: 8 },
+      ],
+      ro12: [
+        { n: "Brad Keselowski", car: 2, seed: 9 },
+        { n: "William Byron", car: 24, seed: 10 },
+        { n: "Alex Bowman", car: 88, seed: 11 },
+        { n: "Clint Bowyer", car: 14, seed: 12 },
+      ],
+      ro16: [
+        { n: "Kurt Busch", car: 1, seed: 13 },
+        { n: "Erik Jones", car: 20, seed: 14 },
+        { n: "Ryan Newman", car: 6, seed: 15 },
+        { n: "Aric Almirola", car: 10, seed: 16 },
+      ],
+    }),
+  },
+  {
+    year: 2018,
+    finale: "Homestead-Miami Speedway",
+    verify: { ro16: "pending", ro12: "pending", ro8: "pending", champ4: "official", champion: "official" },
+    note: "Logano's first title after moving Truex at Martinsville. Earlier rounds pending.",
+    drivers: field({
+      champ4: [
+        { n: "Joey Logano", car: 22, seed: 5, champ: true },
+        { n: "Kevin Harvick", car: 4, seed: 1 },
+        { n: "Kyle Busch", car: 18, seed: 2 },
+        { n: "Martin Truex Jr", car: 78, seed: 3 },
+      ],
+      ro8: [
+        { n: "Kurt Busch", car: 41, seed: 6 },
+        { n: "Aric Almirola", car: 10, seed: 7 },
+        { n: "Clint Bowyer", car: 14, seed: 8 },
+        { n: "Chase Elliott", car: 9, seed: 4 },
+      ],
+      ro12: [
+        { n: "Kyle Larson", car: 42, seed: 9 },
+        { n: "Brad Keselowski", car: 2, seed: 10 },
+        { n: "Ryan Blaney", car: 12, seed: 11 },
+        { n: "Alex Bowman", car: 88, seed: 12 },
+      ],
+      ro16: [
+        { n: "Denny Hamlin", car: 11, seed: 13 },
+        { n: "Erik Jones", car: 20, seed: 14 },
+        { n: "Austin Dillon", car: 3, seed: 15 },
+        { n: "Jimmie Johnson", car: 48, seed: 16 },
+      ],
+    }),
+  },
+  {
+    year: 2017,
+    finale: "Homestead-Miami Speedway",
+    verify: { ro16: "pending", ro12: "pending", ro8: "pending", champ4: "official", champion: "official" },
+    note: "Truex's first title in a dominant year. Earlier rounds pending.",
+    drivers: field({
+      champ4: [
+        { n: "Martin Truex Jr", car: 78, seed: 1, champ: true },
+        { n: "Kyle Busch", car: 18, seed: 3 },
+        { n: "Kevin Harvick", car: 4, seed: 4 },
+        { n: "Brad Keselowski", car: 2, seed: 5 },
+      ],
+      ro8: [
+        { n: "Kyle Larson", car: 42, seed: 2 },
+        { n: "Denny Hamlin", car: 11, seed: 6 },
+        { n: "Chase Elliott", car: 24, seed: 7 },
+        { n: "Jimmie Johnson", car: 48, seed: 8 },
+      ],
+      ro12: [
+        { n: "Ryan Blaney", car: 21, seed: 9 },
+        { n: "Jamie McMurray", car: 1, seed: 10 },
+        { n: "Ricky Stenhouse Jr", car: 17, seed: 11 },
+        { n: "Matt Kenseth", car: 20, seed: 12 },
+      ],
+      ro16: [
+        { n: "Kurt Busch", car: 41, seed: 13 },
+        { n: "Kasey Kahne", car: 5, seed: 14 },
+        { n: "Ryan Newman", car: 31, seed: 15 },
+        { n: "Austin Dillon", car: 3, seed: 16 },
+      ],
+    }),
+  },
+  {
+    year: 2016,
+    finale: "Homestead-Miami Speedway",
+    verify: { ro16: "pending", ro12: "pending", ro8: "pending", champ4: "official", champion: "official" },
+    note: "Johnson's record tying seventh title from 14th on the grid at Homestead.",
+    drivers: field({
+      champ4: [
+        { n: "Jimmie Johnson", car: 48, seed: 6, champ: true },
+        { n: "Kyle Busch", car: 18, seed: 2 },
+        { n: "Joey Logano", car: 22, seed: 3 },
+        { n: "Carl Edwards", car: 19, seed: 4 },
+      ],
+      ro8: [
+        { n: "Kevin Harvick", car: 4, seed: 1 },
+        { n: "Kurt Busch", car: 41, seed: 5 },
+        { n: "Matt Kenseth", car: 20, seed: 7 },
+        { n: "Denny Hamlin", car: 11, seed: 8 },
+      ],
+      ro12: [
+        { n: "Kyle Larson", car: 42, seed: 9 },
+        { n: "Austin Dillon", car: 3, seed: 10 },
+        { n: "Jamie McMurray", car: 1, seed: 11 },
+        { n: "Chase Elliott", car: 24, seed: 12 },
+      ],
+      ro16: [
+        { n: "Martin Truex Jr", car: 78, seed: 13 },
+        { n: "Brad Keselowski", car: 2, seed: 14 },
+        { n: "Tony Stewart", car: 14, seed: 15 },
+        { n: "Chris Buescher", car: 34, seed: 16 },
+      ],
+    }),
+  },
+  {
+    year: 2015,
+    finale: "Homestead-Miami Speedway",
+    verify: { ro16: "pending", ro12: "pending", ro8: "pending", champ4: "official", champion: "official" },
+    note: "Kyle Busch's first title after missing 11 races with injury. Jeff Gordon's final start.",
+    drivers: field({
+      champ4: [
+        { n: "Kyle Busch", car: 18, seed: 4, champ: true },
+        { n: "Kevin Harvick", car: 4, seed: 1 },
+        { n: "Martin Truex Jr", car: 78, seed: 3 },
+        { n: "Jeff Gordon", car: 24, seed: 2 },
+      ],
+      ro8: [
+        { n: "Brad Keselowski", car: 2, seed: 5 },
+        { n: "Carl Edwards", car: 19, seed: 6 },
+        { n: "Joey Logano", car: 22, seed: 7 },
+        { n: "Kurt Busch", car: 41, seed: 8 },
+      ],
+      ro12: [
+        { n: "Jimmie Johnson", car: 48, seed: 9 },
+        { n: "Ryan Newman", car: 31, seed: 10 },
+        { n: "Denny Hamlin", car: 11, seed: 11 },
+        { n: "Dale Earnhardt Jr", car: 88, seed: 12 },
+      ],
+      ro16: [
+        { n: "Matt Kenseth", car: 20, seed: 13 },
+        { n: "Jamie McMurray", car: 1, seed: 14 },
+        { n: "Paul Menard", car: 27, seed: 15 },
+        { n: "Clint Bowyer", car: 15, seed: 16 },
+      ],
+    }),
+  },
+  {
+    year: 2014,
+    finale: "Homestead-Miami Speedway",
+    verify: { ro16: "pending", ro12: "pending", ro8: "pending", champ4: "official", champion: "official" },
+    note: "First year of the elimination format. Harvick's first title. Newman reached the final four without a win all season.",
+    drivers: field({
+      champ4: [
+        { n: "Kevin Harvick", car: 4, seed: 5, champ: true },
+        { n: "Ryan Newman", car: 31, seed: 8 },
+        { n: "Denny Hamlin", car: 11, seed: 6 },
+        { n: "Joey Logano", car: 22, seed: 1 },
+      ],
+      ro8: [
+        { n: "Jeff Gordon", car: 24, seed: 2 },
+        { n: "Matt Kenseth", car: 20, seed: 3 },
+        { n: "Brad Keselowski", car: 2, seed: 4 },
+        { n: "Carl Edwards", car: 99, seed: 7 },
+      ],
+      ro12: [
+        { n: "Jimmie Johnson", car: 48, seed: 9 },
+        { n: "Kyle Larson", car: 42, seed: 10 },
+        { n: "Kurt Busch", car: 41, seed: 11 },
+        { n: "Kasey Kahne", car: 5, seed: 12 },
+      ],
+      ro16: [
+        { n: "Dale Earnhardt Jr", car: 88, seed: 13 },
+        { n: "AJ Allmendinger", car: 47, seed: 14 },
+        { n: "Aric Almirola", car: 43, seed: 15 },
+        { n: "Greg Biffle", car: 16, seed: 16 },
+      ],
+    }),
+  },
+];
+
+/* lookup helpers */
+const seasonByYear = y => SEASONS.find(s => s.year === y) || null;
+const allYears = () => SEASONS.map(s => s.year);
+const isFullyVerified = s =>
+  s && ["ro16", "ro12", "ro8", "champ4", "champion"].every(k => s.verify[k] === "official");
+
+/* ---- src/data/tracks.js ---- */
+/* ============================================================
+   THE CUTLINE . data layer (track context)
+   ------------------------------------------------------------
+   Track context makes a pick informed: which kind of track each
+   round turns on, and how a driver tends to run on that kind.
+
+   Two tiers, both honest about their source:
+
+   ROUND ARCHETYPES are structurally true for the elimination era.
+   Every Round of 8 in this era ran a superspeedway and a short
+   track. Every Round of 12 since 2018 ran the Charlotte Roval
+   road course. The finale ran a flat one mile (Phoenix) or an
+   intermediate (Homestead). These are facts about the calendar.
+
+   DRIVER SPLITS (road course ace, short track specialist,
+   superspeedway gambler) are MODELED archetypes for the demo,
+   flagged below. At handoff they are replaced by real
+   Motorsport Stats driver splits by track type. They never
+   affect scoring. They are pick context only.
+   ============================================================ */
+const SPLITS_SOURCE = "modeled";  /* flip to "motorsport-stats" at handoff */
+
+/* track types used across the game */
+const TRACK_TYPE = {
+  SUPER: "Superspeedway",
+  ROAD: "Road course",
+  SHORT: "Short track",
+  INTER: "Intermediate",
+  FLAT: "Flat mile",
+};
+
+/* signature tracks by round. Recent seasons carry their verified
+   calendar. Earlier seasons fall back to the era archetype, which
+   is true at the type level even when an exact venue differs. */
+const ARCH = {
+  ro16: [TRACK_TYPE.INTER, TRACK_TYPE.SHORT],
+  ro12: [TRACK_TYPE.INTER, TRACK_TYPE.ROAD],
+  ro8: [TRACK_TYPE.SUPER, TRACK_TYPE.SHORT],
+};
+const ROUND_TRACKS = {
+  2025: {
+    ro16: ["Darlington", "World Wide Technology Raceway", "Bristol"],
+    ro12: ["New Hampshire", "Kansas", "Charlotte Roval"],
+    ro8: ["Las Vegas", "Talladega", "Martinsville"],
+    finale: "Phoenix",
+  },
+  2024: {
+    ro16: ["Atlanta", "Watkins Glen", "Bristol"],
+    ro12: ["Kansas", "Talladega", "Charlotte Roval"],
+    ro8: ["Las Vegas", "Homestead", "Martinsville"],
+    finale: "Phoenix",
+  },
+  2023: {
+    ro16: ["Darlington", "Kansas", "Bristol"],
+    ro12: ["Texas", "Talladega", "Charlotte Roval"],
+    ro8: ["Las Vegas", "Homestead", "Martinsville"],
+    finale: "Phoenix",
+  },
+  2022: {
+    ro16: ["Darlington", "Kansas", "Bristol"],
+    ro12: ["Texas", "Talladega", "Charlotte Roval"],
+    ro8: ["Las Vegas", "Homestead", "Martinsville"],
+    finale: "Phoenix",
+  },
+};
+
+/* archetype description for a round, used when a season has no
+   exact calendar wired up. */
+function roundArchetype(round) {
+  return ARCH[round] || [];
+}
+
+/* a short, human readable line describing what a round turns on */
+function roundTrackLine(year, round) {
+  const rt = ROUND_TRACKS[year];
+  if (rt && rt[round]) {
+    const tracks = rt[round];
+    return tracks.join(", ");
+  }
+  const types = roundArchetype(round);
+  return types.length ? types.join(" and ") + " test" : "";
+}
+
+/* MODELED driver archetypes. tags drive the pick context chips
+   only. one to two tags per driver. Replace with real splits at
+   handoff. Drivers not listed get no tag (neutral). */
+const DRIVER_TAGS = {
+  "Shane van Gisbergen": ["road"],
+  "Chase Elliott": ["road"],
+  "AJ Allmendinger": ["road"],
+  "Kyle Larson": ["super", "inter"],
+  "William Byron": ["super", "inter"],
+  "Ryan Blaney": ["super"],
+  "Joey Logano": ["super", "short"],
+  "Denny Hamlin": ["short", "inter"],
+  "Martin Truex Jr": ["short", "inter"],
+  "Christopher Bell": ["short", "road"],
+  "Chase Briscoe": ["inter"],
+  "Bubba Wallace": ["super"],
+  "Austin Cindric": ["super", "road"],
+  "Ross Chastain": ["super", "inter"],
+  "Tyler Reddick": ["road", "inter"],
+  "Kyle Busch": ["short", "inter"],
+  "Kevin Harvick": ["inter", "short"],
+  "Brad Keselowski": ["super"],
+  "Chris Buescher": ["road", "inter"],
+  "Michael McDowell": ["road", "super"],
+  "Alex Bowman": ["inter"],
+  "Austin Dillon": ["super"],
+  "Josh Berry": ["short"],
+  "Jimmie Johnson": ["inter", "short"],
+};
+const TAG_LABEL = {
+  road: "Road course ace",
+  short: "Short track specialist",
+  super: "Superspeedway gambler",
+  inter: "Intermediate runner",
+};
+
+/* which tags matter for a round (so we can surface the relevant
+   tendency next to a driver while picking that round). */
+const ROUND_RELEVANT_TAGS = {
+  ro16: ["short", "inter"],
+  ro12: ["road", "inter"],
+  ro8: ["super", "short"],
+  champ: ["short", "inter", "flat"],
+};
+function driverTags(name) {
+  return DRIVER_TAGS[name] || [];
+}
+
+/* ---- src/data/live-feed.js ---- */
+/* ============================================================
+   THE CUTLINE . data layer (live feed adapter)
+   ------------------------------------------------------------
+   Mode B runs against the in season Motorsport Stats feed. This
+   file defines the adapter interface the real feed implements,
+   and ships a flagged demo feed so the live cutline, the weekly
+   lock, and the leaderboard can be exercised end to end before
+   the real feed is wired.
+
+   FEED_SOURCE is "demo" here. At handoff, drop in a feed that
+   implements the same interface and flip it to "motorsport-stats".
+
+   The interface (all methods return plain data, no UI):
+     meta()              -> { year, source, label }
+     rounds()            -> [ round ]  ordered ro16, ro12, ro8, finale
+     round(key)          -> round | null
+     standings(key)      -> [ { name, car, seed, playoffPoints, won } ]
+                            accumulated through the round so far
+     finishOrder(key)    -> [name] best to worst, for the finale
+
+   A round:
+     { key, label, greenFlag (ms epoch), resolved (bool),
+       races: [ { name, done } ] }
+
+   The live cutline is computed by feeding standings(key) into
+   engine/cutline.computeCutline. Real points in, real cushions
+   out. Nothing here invents a historical result; the demo is
+   clearly a demo and never enters the scored historical archive.
+   ============================================================ */
+const FEED_SOURCE = "demo"; /* flip to "motorsport-stats" at handoff */
+
+/* a frozen demo playoff field so Mode B is explorable. Seeds and
+   points here are illustrative, not a real season. */
+const DEMO_YEAR = 2026;
+const DEMO_FIELD = [
+  { name: "Driver A", car: 1, seed: 1, playoffPoints: 42 },
+  { name: "Driver B", car: 2, seed: 2, playoffPoints: 35 },
+  { name: "Driver C", car: 3, seed: 3, playoffPoints: 28 },
+  { name: "Driver D", car: 4, seed: 4, playoffPoints: 24 },
+  { name: "Driver E", car: 5, seed: 5, playoffPoints: 20 },
+  { name: "Driver F", car: 6, seed: 6, playoffPoints: 18 },
+  { name: "Driver G", car: 7, seed: 7, playoffPoints: 15 },
+  { name: "Driver H", car: 8, seed: 8, playoffPoints: 12 },
+  { name: "Driver I", car: 9, seed: 9, playoffPoints: 10 },
+  { name: "Driver J", car: 10, seed: 10, playoffPoints: 8 },
+  { name: "Driver K", car: 11, seed: 11, playoffPoints: 6 },
+  { name: "Driver L", car: 12, seed: 12, playoffPoints: 5 },
+  { name: "Driver M", car: 13, seed: 13, playoffPoints: 4 },
+  { name: "Driver N", car: 14, seed: 14, playoffPoints: 3 },
+  { name: "Driver O", car: 15, seed: 15, playoffPoints: 2 },
+  { name: "Driver P", car: 16, seed: 16, playoffPoints: 0 },
+];
+
+const HOUR = 3600 * 1000;
+const DAY = 24 * HOUR;
+
+/* demo schedule: the Round of 16 is open and mid resolve, the rest
+   are scheduled in the future. greenFlag relative to "now" at load
+   so the demo always shows one open, locked-soon round. */
+function demoRounds(now) {
+  return [
+    {
+      key: "ro16", label: "Round of 16",
+      greenFlag: now + 2 * DAY, resolved: false,
+      races: [
+        { name: "Darlington", done: true },
+        { name: "Gateway", done: true },
+        { name: "Bristol", done: false },
+      ],
+    },
+    { key: "ro12", label: "Round of 12", greenFlag: now + 9 * DAY, resolved: false,
+      races: [{ name: "New Hampshire", done: false }, { name: "Kansas", done: false }, { name: "Charlotte Roval", done: false }] },
+    { key: "ro8", label: "Round of 8", greenFlag: now + 16 * DAY, resolved: false,
+      races: [{ name: "Las Vegas", done: false }, { name: "Talladega", done: false }, { name: "Martinsville", done: false }] },
+    { key: "finale", label: "Championship 4", greenFlag: now + 23 * DAY, resolved: false,
+      races: [{ name: "Phoenix", done: false }] },
+  ];
+}
+
+/* demo accumulated standings through the open round. One driver has
+   already won in round (locked in), the rest carry base plus points
+   so the cutline math has something real to chew on. */
+function demoStandings(key, base) {
+  /* points within the round so far layered on the seed field */
+  const inRound = {
+    "Driver A": 38, "Driver B": 30, "Driver C": 33, "Driver D": 22,
+    "Driver E": 19, "Driver F": 25, "Driver G": 14, "Driver H": 11,
+    "Driver I": 13, "Driver J": 7, "Driver K": 9, "Driver L": 4,
+    "Driver M": 6, "Driver N": 2, "Driver O": 3, "Driver P": 1,
+  };
+  const winners = new Set(["Driver F"]); /* won and in */
+  return DEMO_FIELD.map(d => ({
+    name: d.name, car: d.car, seed: d.seed,
+    playoffPoints: d.playoffPoints,
+    points: base + d.playoffPoints + (inRound[d.name] || 0),
+    won: winners.has(d.name),
+  }));
+}
+
+/* the demo adapter */
+function demoFeed(now = Date.now()) {
+  const rounds = demoRounds(now);
+  const ROUND_BASE = { ro16: 2000, ro12: 3000, ro8: 4000, finale: 5000 };
+  return {
+    meta: () => ({ year: DEMO_YEAR, source: FEED_SOURCE, label: "Demo playoff feed" }),
+    rounds: () => rounds.slice(),
+    round: key => rounds.find(r => r.key === key) || null,
+    standings: key => demoStandings(key, ROUND_BASE[key] || 0),
+    finishOrder: () => DEMO_FIELD.map(d => d.name),
+  };
+}
+
+/* validate that an arbitrary object satisfies the adapter contract,
+   so a real feed can be checked at integration time. */
+function isFeedAdapter(obj) {
+  return !!obj &&
+    typeof obj.meta === "function" &&
+    typeof obj.rounds === "function" &&
+    typeof obj.round === "function" &&
+    typeof obj.standings === "function" &&
+    typeof obj.finishOrder === "function";
+}
+
+/* ---- src/engine/rng.js ---- */
+/* ============================================================
+   THE CUTLINE . engine (rng + daily determinism)
+   ------------------------------------------------------------
+   A given date always serves the same historical field. The
+   daily rotates only through fully verified seasons.
+   ============================================================ */
+
+/* deterministic 32 bit PRNG */
+function mulberry32(a) {
+  return function () {
+    a |= 0;
+    a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/* epoch day 1 of the daily. 2026-06-18 UTC = puzzle No. 1. */
+const DAY0_UTC = Date.UTC(2026, 5, 18);
+const DAY_MS = 86400000;
+
+/* puzzle number for a given timestamp (defaults to now) */
+function puzzleNumber(now = Date.now()) {
+  return Math.floor((now - DAY0_UTC) / DAY_MS) + 1;
+}
+
+/* the season year served on a given puzzle number. deterministic
+   and uniform across the verified pool. */
+function dailyYear(no, pool = DAILY_POOL_YEARS) {
+  const rng = mulberry32((no * 2654435761) >>> 0);
+  return pool[Math.floor(rng() * pool.length)];
+}
+
+/* convenience: the daily descriptor for a timestamp */
+function pickDaily(now = Date.now(), pool = DAILY_POOL_YEARS) {
+  const no = puzzleNumber(now);
+  return { no, year: dailyYear(no, pool), mode: "daily" };
+}
+
+/* string seed helper for archive runs that should still be stable
+   within a session but distinct from the daily. */
+function strSeed(str) {
+  let h = 2166136261 >>> 0;
+  for (let i = 0; i < str.length; i++) {
+    h ^= str.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return h >>> 0;
+}
+
+/* ---- src/engine/cutline.js ---- */
+/* ============================================================
+   THE CUTLINE . engine (cutline points math)
+   ------------------------------------------------------------
+   The real NASCAR playoff points rules, implemented and tested.
+   The algorithm is the verified part. Exact historical point
+   values arrive from the Motorsport Stats feed; this module turns
+   them into the cushion numbers the bracket shows.
+
+   Rules encoded:
+   . each round resets every surviving driver to a round base,
+     then adds the playoff points they carry.
+       Round of 16 base 2000
+       Round of 12 base 3000
+       Round of 8  base 4000
+       finale      base 5000, no playoff points added
+   . a win inside a round locks that driver into the next round
+     regardless of points (win and in).
+   . the bottom drivers by points among non winners are cut to
+     leave the round's transfer count.
+   . the finale is decided by finishing order, not points: the
+     highest finisher of the four is champion.
+   ============================================================ */
+const ROUND_BASE = { ro16: 2000, ro12: 3000, ro8: 4000, finale: 5000 };
+const TRANSFER_SLOTS = { ro16: 12, ro12: 8, ro8: 4 };
+
+/* reset standings entering a round.
+   drivers: [{ name, playoffPoints }]
+   returns [{ name, points }] with points = base + playoffPoints,
+   except the finale which adds nothing. */
+function resetEntering(drivers, round) {
+  const base = ROUND_BASE[round];
+  const addPP = round !== "finale";
+  return drivers.map(d => ({
+    name: d.name,
+    points: base + (addPP ? (d.playoffPoints || 0) : 0),
+  }));
+}
+
+/* compute the cutline for a round.
+   standings: [{ name, points, won? }] accumulated through the round.
+   round: "ro16" | "ro12" | "ro8"
+   returns:
+     advancing   Set of names who transfer (winners + top points)
+     firstOut    { name, points } | null   (highest eliminated)
+     lastIn      { name, points } | null   (lowest non winner advancing)
+     cushions    Map name -> signed points relative to the line
+                 (+ above, - below; winners are +Infinity = locked)
+     locked      Set of names locked in by a win */
+function computeCutline(standings, round) {
+  const slots = TRANSFER_SLOTS[round];
+  if (!Number.isInteger(slots)) throw new Error("unknown round: " + round);
+
+  const locked = new Set(standings.filter(s => s.won).map(s => s.name));
+  const contenders = standings
+    .filter(s => !s.won)
+    .slice()
+    .sort((a, b) => b.points - a.points || a.name.localeCompare(b.name));
+
+  const remaining = Math.max(0, slots - locked.size);
+  const lastIn = remaining > 0 ? contenders[remaining - 1] || null : null;
+  const firstOut = contenders[remaining] || null;
+
+  const advancing = new Set(locked);
+  for (let i = 0; i < remaining && i < contenders.length; i++) {
+    advancing.add(contenders[i].name);
+  }
+
+  const cushions = new Map();
+  for (const s of standings) {
+    if (locked.has(s.name)) { cushions.set(s.name, Infinity); continue; }
+    if (advancing.has(s.name)) {
+      /* margin to the first driver below the line */
+      cushions.set(s.name, firstOut ? s.points - firstOut.points : Infinity);
+    } else {
+      /* deficit to the last driver above the line */
+      cushions.set(s.name, lastIn ? s.points - lastIn.points : -Infinity);
+    }
+  }
+
+  return { advancing, firstOut, lastIn, cushions, locked };
+}
+
+/* cushion for a single driver, given a computed cutline */
+function cushionFor(name, cutInfo) {
+  const v = cutInfo.cushions.get(name);
+  return v === undefined ? null : v;
+}
+
+/* finale: highest finisher of the championship four is champion.
+   finishOrder: [names] best to worst (only the four matter). */
+function finaleChampion(champ4Names, finishOrder) {
+  for (const name of finishOrder) {
+    if (champ4Names.includes(name)) return name;
+  }
+  return null;
+}
+
+/* format a cushion for display: "+18", "-7", "LOCKED", "CUT" */
+function cushionLabel(v) {
+  if (v === Infinity) return "LOCKED";
+  if (v === -Infinity) return "OUT";
+  if (v === null) return "";
+  if (v > 0) return "+" + v;
+  if (v === 0) return "EVEN";
+  return String(v);
+}
+
+/* ---- src/engine/scoring.js ---- */
+/* ============================================================
+   THE CUTLINE . engine (scoring)
+   ------------------------------------------------------------
+   Two numbers come out of a played bracket:
+
+   GRADE is accuracy. How right was the bracket, round weighted,
+   on a 0 to 100 scale. A correct Championship 4 pick counts more
+   than a Round of 16 survivor; the champion counts most.
+
+   SCORE is points. Grade plus the strategy layers: perfect round
+   bonuses, called upset bonuses (a driver below the line who
+   advances anyway), and the confidence bet (multiply a round's
+   points, but pay the extra stake on what you miss). Score is the
+   leaderboard number; it separates skill from luck.
+
+   This module assumes the season's results are verified truth.
+   Only fully verified seasons are ever scored.
+   ============================================================ */
+
+/* round model */
+const ROUNDS = [
+  { key: "ro16", slots: 12, weight: 1, cut: 16, perfect: 3, upset: 2, label: "Round of 16" },
+  { key: "ro12", slots: 8, weight: 2, cut: 12, perfect: 4, upset: 2, label: "Round of 12" },
+  { key: "ro8", slots: 4, weight: 4, cut: 8, perfect: 6, upset: 3, label: "Round of 8" },
+];
+const CHAMPION_WEIGHT = 12;
+
+/* accuracy ceiling: every survivor right at every round, plus champ */
+const ACCURACY_MAX =
+  ROUNDS.reduce((s, r) => s + r.slots * r.weight, 0) + CHAMPION_WEIGHT;
+
+/* did a driver survive a given round's cut?
+   out = round eliminated (16/12/8) or 4 for the Championship 4.
+   surviving round R means out is deeper than R's cut. */
+function survived(driver, roundCut) {
+  return driver.out < roundCut; /* out 4 survives all; out 16 survives none */
+}
+
+/* clamp confidence to the allowed bet levels */
+function conf(c) {
+  return c === 2 || c === 1.5 ? c : 1;
+}
+
+/* score a played bracket.
+   args:
+     season    { drivers:[{n,out,champ}], ... }
+     picks     { ro16:[names], ro12:[names], ro8:[names], champion:name }
+     confidence{ ro16,ro12,ro8,champion } each 1 | 1.5 | 2 (optional)
+     belowLine { ro16:Set, ro12:Set, ro8:Set } names below the line
+               entering the round's final race, for upset bonus
+               (optional; no fabrication when absent) */
+function scoreBracket({ season, picks, confidence = {}, belowLine = {} }) {
+  const byName = new Map(season.drivers.map(d => [d.n, d]));
+  const detail = [];
+  let accuracy = 0;
+  let score = 0;
+
+  for (const r of ROUNDS) {
+    const advanced = picks[r.key] || [];
+    let hits = 0;
+    let upsets = 0;
+    for (const name of advanced) {
+      const d = byName.get(name);
+      if (d && survived(d, r.cut)) {
+        hits++;
+        const bl = belowLine[r.key];
+        if (bl && bl.has(name)) upsets++;
+      }
+    }
+    accuracy += hits * r.weight;
+
+    const c = conf(confidence[r.key]);
+    const perfect = hits === r.slots;
+    const earned = hits * r.weight + (perfect ? r.perfect : 0) + upsets * r.upset;
+    const misses = r.slots - hits;
+    const riskPenalty = misses * r.weight * (c - 1);
+    const net = Math.round(earned * c - riskPenalty);
+    score += net;
+
+    detail.push({
+      key: r.key, label: r.label, slots: r.slots, hits, perfect,
+      upsets, confidence: c, net,
+    });
+  }
+
+  /* champion */
+  const championPick = picks.champion || null;
+  const realChamp = season.drivers.find(d => d.champ);
+  const championOK = !!(championPick && realChamp && championPick === realChamp.n);
+  if (championOK) accuracy += CHAMPION_WEIGHT;
+  const cc = conf(confidence.champion);
+  const champEarned = championOK ? CHAMPION_WEIGHT : 0;
+  const champPenalty = championOK ? 0 : CHAMPION_WEIGHT * (cc - 1);
+  const champNet = Math.round(champEarned * cc - champPenalty);
+  score += champNet;
+
+  const grade = Math.round((accuracy / ACCURACY_MAX) * 100);
+
+  const out = {
+    grade,
+    score,
+    championOK,
+    championPick,
+    realChampName: realChamp ? realChamp.n : null,
+    detail,
+    champNet,
+    percentile: estimatePercentile(grade),
+  };
+  Object.assign(out, verdict(out));
+  return out;
+}
+
+/* estimated percentile vs the field, from grade. A real leaderboard
+   replaces this in live mode; here it is a calibrated curve and is
+   always labelled estimated in product. */
+function estimatePercentile(grade) {
+  /* sigmoid centred near a typical bracket (~55 grade) */
+  const p = 100 / (1 + Math.exp(-(grade - 52) / 12));
+  return Math.max(1, Math.min(99, Math.round(p)));
+}
+
+/* a label and tag tone for the verdict card */
+function verdict(out) {
+  if (out.championOK && out.grade >= 85)
+    return { label: "Crystal ball", tag: "good", headline: "You called the title" };
+  if (out.grade >= 70)
+    return { label: "Strong bracket", tag: "good", headline: out.grade + "% accurate" };
+  if (out.grade >= 50)
+    return { label: "Solid read", tag: "mid", headline: out.grade + "% accurate" };
+  return { label: "Busted bracket", tag: "bad", headline: out.grade + "% accurate" };
+}
+
+/* ---- src/engine/lock.js ---- */
+/* ============================================================
+   THE CUTLINE . engine (live pick lock)
+   ------------------------------------------------------------
+   Mode B integrity. A round's survivor picks lock at the green
+   flag of the round's first race and cannot change after. This
+   module is the single gate for that rule.
+   ============================================================ */
+
+/* a round is open for picks until its first green flag */
+function isRoundOpen(round, now = Date.now()) {
+  if (!round || round.greenFlag == null) return false;
+  return now < round.greenFlag;
+}
+
+/* the lock state for a round */
+function lockState(round, now = Date.now()) {
+  if (!round || round.greenFlag == null) return "unscheduled";
+  return now < round.greenFlag ? "open" : "locked";
+}
+
+/* attempt to set picks for a round. returns a result object rather
+   than throwing so the UI can show a clean message. once locked,
+   the stored picks are final. */
+function submitPicks(state, roundKey, picks, now = Date.now()) {
+  const round = state.rounds && state.rounds[roundKey];
+  if (!round) return { ok: false, reason: "unknown-round", picks: null };
+  if (lockState(round, now) !== "open") {
+    return { ok: false, reason: "locked", picks: state.picks[roundKey] || null };
+  }
+  state.picks[roundKey] = picks.slice();
+  state.lockedAt = state.lockedAt || {};
+  return { ok: true, picks: state.picks[roundKey] };
+}
+
+/* explicit hard lock at green flag. idempotent. after this the
+   picks for the round are frozen. */
+function lockRound(state, roundKey, now = Date.now()) {
+  state.lockedAt = state.lockedAt || {};
+  if (state.lockedAt[roundKey] == null) state.lockedAt[roundKey] = now;
+  return state.lockedAt[roundKey];
+}
+
+/* can the player still edit this round? */
+function canEdit(state, roundKey, now = Date.now()) {
+  const round = state.rounds && state.rounds[roundKey];
+  return lockState(round, now) === "open";
+}
+
+/* milliseconds until lock, or null if not open */
+function timeToLock(round, now = Date.now()) {
+  if (lockState(round, now) !== "open") return null;
+  return round.greenFlag - now;
+}
+
+/* ---- src/engine/bracket.js ---- */
+/* ============================================================
+   THE CUTLINE . engine (bracket state machine)
+   ------------------------------------------------------------
+   Drives the play loop independent of any rendering. Advance who
+   survives each cut: 16 to 12 to 8 to 4, then crown a champion.
+   Tracks the advanced set per stage so scoring and the reveal can
+   replay the player's bracket.
+   ============================================================ */
+const STAGES = [
+  { key: "ro16", round: "Round of 16", from: 16, keep: 12, next: "Round of 12" },
+  { key: "ro12", round: "Round of 12", from: 12, keep: 8, next: "Round of 8" },
+  { key: "ro8", round: "Round of 8", from: 8, keep: 4, next: "Championship 4" },
+  { key: "champ", round: "Championship 4", from: 4, keep: 1, next: "Crown" },
+];
+
+/* start a bracket from a season. pool ordered by seed for a clean
+   top to bottom bracket. */
+function startBracket(season, opts = {}) {
+  const pool = season.drivers
+    .slice()
+    .sort((a, b) => (a.seed || 99) - (b.seed || 99) || a.car - b.car);
+  return {
+    season,
+    mode: opts.mode || "daily",
+    no: opts.no || null,
+    stage: 0,
+    pool,
+    selection: [],
+    history: { ro16: null, ro12: null, ro8: null, champion: null },
+    confidence: { ro16: 1, ro12: 1, ro8: 1, champion: 1 },
+    done: false,
+  };
+}
+function currentStage(state) {
+  return STAGES[state.stage];
+}
+
+/* toggle a driver in the current selection, honouring the keep
+   count. champion stage is single select with swap. */
+function toggle(state, name) {
+  const st = currentStage(state);
+  const i = state.selection.indexOf(name);
+  if (i >= 0) { state.selection.splice(i, 1); return { ok: true }; }
+  if (state.selection.length >= st.keep) {
+    if (st.keep === 1) { state.selection = [name]; return { ok: true }; }
+    return { ok: false, reason: "full", keep: st.keep };
+  }
+  state.selection.push(name);
+  return { ok: true };
+}
+function canAdvance(state) {
+  return state.selection.length === currentStage(state).keep;
+}
+
+/* advance the bracket. records the advanced set, narrows the pool,
+   and moves to the next stage. returns { done } when the champion
+   is crowned. */
+function advance(state) {
+  const st = currentStage(state);
+  if (state.selection.length !== st.keep) {
+    return { ok: false, reason: "incomplete", need: st.keep };
+  }
+  if (st.key === "champ") {
+    state.history.champion = state.selection[0];
+    state.done = true;
+    return { ok: true, done: true };
+  }
+  state.history[st.key] = state.selection.slice();
+  state.pool = state.selection
+    .slice()
+    .sort((a, b) => byName(state, a).seed - byName(state, b).seed)
+    .map(n => byName(state, n));
+  state.selection = [];
+  state.stage++;
+  return { ok: true, done: false };
+}
+
+function byName(state, name) {
+  return state.season.drivers.find(d => d.n === name);
+}
+
+/* turn the recorded history into the picks object scoring expects */
+function toPicks(state) {
+  return {
+    ro16: state.history.ro16 || [],
+    ro12: state.history.ro12 || [],
+    ro8: state.history.ro8 || [],
+    champion: state.history.champion || null,
+  };
+}
+
+/* ---- src/render/dom.js ---- */
+/* ============================================================
+   THE CUTLINE . render helpers
+   ------------------------------------------------------------
+   Minimal DOM utilities. No framework. Names are globally unique
+   so the build step can inline every module into one script.
+   ============================================================ */
+
+/* escape text for safe insertion into markup */
+function esc(s) {
+  return String(s == null ? "" : s)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+/* build an element from a tag, attributes, and children/markup */
+function el(tag, attrs = {}, html) {
+  const node = document.createElement(tag);
+  for (const k in attrs) {
+    const v = attrs[k];
+    if (v == null || v === false) continue;
+    if (k === "class") node.className = v;
+    else if (k === "html") node.innerHTML = v;
+    else if (k.slice(0, 2) === "on" && typeof v === "function") {
+      node.addEventListener(k.slice(2).toLowerCase(), v);
+    } else node.setAttribute(k, v === true ? "" : v);
+  }
+  if (html != null) node.innerHTML = html;
+  return node;
+}
+function clear(node) { while (node && node.firstChild) node.removeChild(node.firstChild); }
+function mount(node, ...children) {
+  clear(node);
+  for (const c of children) if (c) node.appendChild(c);
+  return node;
+}
+
+/* ---- src/render/bracket-view.js ---- */
+/* ============================================================
+   THE CUTLINE . render (bracket view)
+   ------------------------------------------------------------
+   Draws the pick surface for the current round: a round heading
+   with track context, then the field as a single column split by
+   the cutline. Survivors you pick lift above the line; the rest
+   sit below it. Cushions shown next to each driver are modeled
+   (flagged in product) and never affect scoring.
+
+   Also renders the read only desktop wide bracket from a played
+   or revealed state.
+   ============================================================ */
+
+
+
+
+const ROUND_PROMPT = {
+  ro16: "Pick the 12 who survive the Round of 16",
+  ro12: "Pick the 8 who survive the Round of 12",
+  ro8: "Pick the Championship 4",
+  champ: "Crown your champion",
+};
+
+/* modeled cushion line for a driver entering a round. Derived from
+   seed only, clearly a model. Real points arrive from the feed. */
+function modeledCushion(driver, stage) {
+  if (stage.key === "champ") return null;
+  const seed = driver.seed || 8;
+  const mid = stage.keep + 0.5;
+  /* rough, monotonic in seed: better seed, bigger cushion */
+  const v = Math.round((mid - seed) * 6);
+  return v;
+}
+
+function cushionClass(v) {
+  if (v === Infinity) return "lock";
+  if (v > 0) return "pos";
+  if (v < 0) return "neg";
+  return "";
+}
+
+function tagChips(name, stage) {
+  const relevant = new Set(ROUND_RELEVANT_TAGS[stage.key] || []);
+  const tags = driverTags(name).filter(t => relevant.has(t));
+  if (!tags.length) return "";
+  return '<div class="tags">' +
+    tags.map(t => '<span class="tag">' + esc(TAG_LABEL[t] || t) + "</span>").join("") +
+    "</div>";
+}
+
+/* render the round head into a container */
+function renderRoundHead(node, state) {
+  const st = currentStage(state);
+  const year = state.season.year;
+  const trackLine = roundTrackLine(year, st.key);
+  const chosen = state.selection.length;
+  mount(node,
+    el("div", { class: "round-head" },
+      '<div class="rt">' + esc(st.round) + "</div>" +
+      (trackLine ? '<div class="rmeta">Runs on: ' + esc(trackLine) + ".</div>" : "") +
+      '<div class="rprompt">' + esc(ROUND_PROMPT[st.key]) +
+      ' <span class="rcount">(' + chosen + " of " + st.keep + " picked)</span></div>"
+    )
+  );
+}
+
+/* render the pick surface (single column split by the cutline) */
+function renderPickSurface(node, state, onChange) {
+  const st = currentStage(state);
+  const board = el("div", { class: "cutboard" });
+
+  /* selected (above the line) first, in seed order; then the rest */
+  const selected = state.pool.filter(d => state.selection.includes(d.n));
+  const rest = state.pool.filter(d => !state.selection.includes(d.n));
+
+  const above = el("div", { class: "colstack", role: "group", "aria-label": "Surviving picks" });
+  const below = el("div", { class: "colstack", role: "group", "aria-label": "Below the cutline" });
+
+  const makeRow = (d, on) => {
+    const cushion = modeledCushion(d, st);
+    const cu = cushion == null ? "" :
+      '<span class="cushion ' + cushionClass(cushion) + '" title="Modeled cushion (not scored)">' +
+      esc(cushionLabel(cushion)) + "</span>";
+    const isChamp = st.key === "champ";
+    const row = el("button", {
+      class: "drow" + (on ? (isChamp ? " on crowned" : " on") : ""),
+      type: "button",
+      "aria-pressed": on ? "true" : "false",
+      "aria-label": d.n + (on ? ", selected" : ", not selected"),
+    },
+      '<span class="seed" aria-hidden="true">' + (d.seed || "") + "</span>" +
+      '<span><span class="nm">' + esc(d.n) +
+      '<span class="car">#' + esc(d.car) + "</span></span>" +
+      tagChips(d.n, st) + "</span>" +
+      (cu || '<span class="tick" aria-hidden="true">' + (on ? "\u25B2" : "+") + "</span>")
+    );
+    row.addEventListener("click", () => {
+      toggle(state, d.n);
+      renderPickSurface(node, state, onChange);
+      if (onChange) onChange();
+    });
+    return row;
+  };
+
+  selected.forEach(d => above.appendChild(makeRow(d, true)));
+  rest.forEach(d => below.appendChild(makeRow(d, false)));
+
+  board.appendChild(above);
+
+  if (st.key !== "champ") {
+    const remaining = st.keep - state.selection.length;
+    const tightLabel = remaining > 0
+      ? remaining + " more above the line"
+      : "line set, advance when ready";
+    board.appendChild(el("div", { class: "cutline", role: "separator", "aria-label": "The cutline" },
+      '<span class="ctag">The cutline</span>' +
+      '<span class="ctight">' + esc(tightLabel) + "</span>"));
+  }
+
+  board.appendChild(below);
+  mount(node, board);
+}
+
+/* desktop wide bracket from a finished/revealed bracket state.
+   columns: 4 rounds plus the crown. Uses recorded history. */
+function renderWideBracket(node, state) {
+  const s = state.season;
+  const byName = new Map(s.drivers.map(d => [d.n, d]));
+  const cols = [
+    { key: "ro16", title: "Round of 16", cut: 16 },
+    { key: "ro12", title: "Round of 12", cut: 12 },
+    { key: "ro8", title: "Round of 8", cut: 8 },
+    { key: "champ", title: "Championship 4", cut: 4 },
+  ];
+  const wrap = el("div", { class: "wide-bracket", "aria-label": "Full bracket" });
+
+  cols.forEach(col => {
+    const c = el("div", { class: "wb-col" }, "<h4>" + esc(col.title) + "</h4>");
+    let list;
+    if (col.key === "ro16") list = s.drivers.slice();
+    else list = s.drivers.filter(d => d.out < col.cut + 0.5 && d.out >= col.cut);
+    /* show survivors of each round in that round's column */
+    const survivors = s.drivers.filter(d => d.out < col.cut).slice()
+      .sort((a, b) => (a.seed || 99) - (b.seed || 99));
+    const pool = col.key === "ro16" ? s.drivers.slice().sort((a, b) => (a.seed || 99) - (b.seed || 99)) : survivors;
+    pool.forEach(d => {
+      const advanced = d.out < col.cut;
+      const isChamp = col.key === "champ" && d.champ;
+      c.appendChild(el("div", {
+        class: "wb-cell" + (isChamp ? " champ" : advanced ? " adv" : " cut"),
+      },
+        '<span>' + esc(d.n) + "</span>" +
+        '<span class="wbseed">' + (d.seed || "") + "</span>"));
+    });
+    wrap.appendChild(c);
+  });
+
+  const champ = s.drivers.find(d => d.champ);
+  wrap.appendChild(el("div", { class: "wb-crown" },
+    "Champion<br>" + esc(champ ? champ.n : "")));
+
+  mount(node, wrap);
+}
+
+/* ---- src/render/reveal.js ---- */
+/* ============================================================
+   THE CUTLINE . render (reveal)
+   ------------------------------------------------------------
+   After a bracket is submitted, reveal what really happened. For
+   each round we show the player's survivors against the real cut,
+   marking each pick a hit, a miss, or a called upset, then the
+   champion. Plain, declarative, no dashes in copy.
+   ============================================================ */
+
+
+const REVEAL_ROUNDS = [
+  { key: "ro16", label: "Round of 16", cut: 16, keep: 12 },
+  { key: "ro12", label: "Round of 12", cut: 12, keep: 8 },
+  { key: "ro8", label: "Round of 8", cut: 8, keep: 4 },
+];
+
+/* build the reveal into a container.
+   state: finished bracket state (has season + history)
+   result: output of scoreBracket
+   belowLine: optional { roundKey: Set } of below the line names */
+function renderReveal(node, state, result, belowLine = {}) {
+  const s = state.season;
+  const byName = new Map(s.drivers.map(d => [d.n, d]));
+  const picks = state.history;
+  const frag = document.createDocumentFragment();
+
+  REVEAL_ROUNDS.forEach(rd => {
+    const advanced = picks[rd.key] || [];
+    let hits = 0;
+    const rows = advanced.map(name => {
+      const d = byName.get(name);
+      const ok = d && survived(d, rd.cut);
+      if (ok) hits++;
+      const bl = belowLine[rd.key];
+      const upset = ok && bl && bl.has(name);
+      let cls = "drow ", note;
+      if (upset) { cls += "r-upset"; note = "Called upset. Below the line, advanced anyway."; }
+      else if (ok) { cls += "r-hit"; note = "Survived the cut."; }
+      else { cls += "r-miss"; note = "Cut here in reality."; }
+      return el("div", { class: cls },
+        '<span class="seed" aria-hidden="true">' + (d ? d.seed || "" : "") + "</span>" +
+        '<span><span class="nm">' + esc(name) + "</span>" +
+        '<span class="reveal-note">' + esc(note) + "</span></span>" +
+        '<span class="tick" aria-hidden="true">' +
+        (upset ? "\u26A1" : ok ? "\u2713" : "\u2717") + "</span>");
+    });
+
+    const summaryCls = hits === rd.keep ? "good" : hits === 0 ? "bad" : "";
+    const round = el("div", { class: "reveal-round" });
+    round.appendChild(el("div", { class: "rrh" },
+      "<span>" + esc(rd.label) + "</span>" +
+      '<span class="rrs ' + summaryCls + '">' + hits + " of " + rd.keep + " right</span>"));
+    rows.forEach(r => round.appendChild(r));
+    frag.appendChild(round);
+  });
+
+  /* champion */
+  const champPick = picks.champion;
+  const realChamp = s.drivers.find(d => d.champ);
+  const champOK = champPick && realChamp && champPick === realChamp.n;
+  const champRound = el("div", { class: "reveal-round" });
+  champRound.appendChild(el("div", { class: "rrh" },
+    "<span>Champion</span>" +
+    '<span class="rrs ' + (champOK ? "good" : "bad") + '">' +
+    (champOK ? "Called it" : "Missed") + "</span>"));
+  champRound.appendChild(el("div", { class: "drow " + (champOK ? "r-hit" : "r-miss") },
+    '<span class="seed" aria-hidden="true"></span>' +
+    '<span><span class="nm">' + esc(realChamp ? realChamp.n : "") + "</span>" +
+    '<span class="reveal-note">' +
+    (champOK ? "Your pick took the title."
+      : "You picked " + esc(champPick || "no one") + ". The title went to " + esc(realChamp ? realChamp.n : "") + ".") +
+    "</span></span>" +
+    '<span class="tick" aria-hidden="true">' + (champOK ? "\u2713" : "\u2717") + "</span>"));
+  frag.appendChild(champRound);
+
+  mount(node, frag);
+}
+
+/* ---- src/render/share.js ---- */
+/* ============================================================
+   THE CUTLINE . render (share)
+   ------------------------------------------------------------
+   A spoiler free share grid. One row per round, a square per
+   surviving pick: filled for a hit, hollow for a miss, a bolt for
+   a called upset. A flag marks the champion call. Builds the text
+   for the clipboard and renders a preview.
+   ============================================================ */
+
+
+const SHARE_ROUNDS = [
+  { key: "ro16", keep: 12 },
+  { key: "ro12", keep: 8 },
+  { key: "ro8", keep: 4 },
+];
+
+const HIT = "\u{1F7E9}";    /* green square */
+const MISS = "\u2B1C";       /* white square */
+const UPSET = "\u26A1";      /* bolt */
+const FLAG = "\u{1F3C1}";    /* chequered flag */
+const NO = "\u274C";         /* cross mark */
+
+/* build the share text. result is scoreBracket output. */
+function buildShareText(state, result, belowLine = {}) {
+  const s = state.season;
+  const byName = new Map(s.drivers.map(d => [d.n, d]));
+  const picks = state.history;
+  const no = state.no ? "#" + state.no : "";
+  const lines = [];
+  lines.push("THE CUTLINE " + no + " . " + s.year);
+
+  SHARE_ROUNDS.forEach(rd => {
+    const advanced = picks[rd.key] || [];
+    let cells = "";
+    advanced.forEach(name => {
+      const d = byName.get(name);
+      const survivedRound = d && survived(d, rdCut(rd.key));
+      const bl = belowLine[rd.key];
+      if (survivedRound && bl && bl.has(name)) cells += UPSET;
+      else if (survivedRound) cells += HIT;
+      else cells += MISS;
+    });
+    lines.push(cells);
+  });
+
+  const realChamp = s.drivers.find(d => d.champ);
+  const champOK = picks.champion && realChamp && picks.champion === realChamp.n;
+  lines.push((champOK ? FLAG : NO) + " " + (champOK ? "Champion called" : "Champion missed"));
+  lines.push("Grade " + result.grade + "% . " + result.score + " pts");
+  lines.push("motorsport.com/cutline");
+  return lines.join("\n");
+}
+
+function rdCut(key) { return key === "ro16" ? 16 : key === "ro12" ? 12 : 8; }
+
+/* render the share preview + copy control into a container */
+function renderShare(node, state, result, belowLine = {}, onCopy) {
+  const text = buildShareText(state, result, belowLine);
+  const box = el("div", { class: "sharebox" });
+  box.appendChild(el("div", { class: "sharegrid", "aria-hidden": "true" }, escapeGrid(text)));
+  box.appendChild(el("div", { class: "sharecap" }, "Spoiler free. Share your bracket without giving away the field."));
+
+  const copyBtn = el("button", { class: "btn", type: "button" }, "Copy result");
+  copyBtn.addEventListener("click", async () => {
+    let ok = false;
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(text);
+        ok = true;
+      }
+    } catch (e) { ok = false; }
+    if (!ok) {
+      const ta = document.createElement("textarea");
+      ta.value = text; document.body.appendChild(ta); ta.select();
+      try { document.execCommand("copy"); ok = true; } catch (e) {}
+      document.body.removeChild(ta);
+    }
+    if (onCopy) onCopy(ok, text);
+  });
+
+  mount(node, box, el("div", { class: "actionbar" }, ""));
+  node.lastChild.appendChild(copyBtn);
+  return text;
+}
+
+function escapeGrid(s) {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+/* ---- src/ui/analytics.js ---- */
+/* ============================================================
+   THE CUTLINE . analytics
+   ------------------------------------------------------------
+   One thin layer for product events. By default it pushes to a
+   window.dataLayer (GTM friendly) and calls window.gtag when
+   present, and is a safe no op otherwise. The CMS can replace the
+   sink with setAnalyticsSink to route events anywhere.
+   ============================================================ */
+const EVENTS = {
+  GAME_START: "cutline_game_start",
+  ROUND_ADVANCE: "cutline_round_advance",
+  CHAMPION_PICK: "cutline_champion_pick",
+  SUBMIT: "cutline_submit",
+  REVEAL_VIEW: "cutline_reveal_view",
+  SHARE: "cutline_share",
+  MODE_SWITCH: "cutline_mode_switch",
+  ARCHIVE_OPEN: "cutline_archive_open",
+  WEEKLY_LOCK: "cutline_weekly_lock",
+  HELP_OPEN: "cutline_help_open",
+};
+
+let sink = defaultSink;
+function setAnalyticsSink(fn) { sink = typeof fn === "function" ? fn : defaultSink; }
+function track(event, props = {}) {
+  try { sink(event, { ...props, ts: Date.now() }); } catch (e) { /* never break the game on analytics */ }
+}
+
+function defaultSink(event, props) {
+  if (typeof window === "undefined") return;
+  if (Array.isArray(window.dataLayer)) window.dataLayer.push({ event, ...props });
+  if (typeof window.gtag === "function") window.gtag("event", event, props);
+}
+
+/* ---- src/ui/store.js ---- */
+/* ============================================================
+   THE CUTLINE . persistence
+   ------------------------------------------------------------
+   Streaks and career stats survive across sessions when storage
+   is available, and degrade to in memory when it is not (private
+   mode, sandboxed embed). The game never breaks on storage.
+   ============================================================ */
+
+const KEY = "cutline:v1";
+const mem = {};
+let useLS = false;
+
+try {
+  const k = "__cutline_probe__";
+  window.localStorage.setItem(k, "1");
+  window.localStorage.removeItem(k);
+  useLS = true;
+} catch (e) { useLS = false; }
+function loadStats() {
+  try {
+    const raw = useLS ? window.localStorage.getItem(KEY) : mem[KEY];
+    return raw ? JSON.parse(raw) : statsDefaults();
+  } catch (e) { return statsDefaults(); }
+}
+function saveStats(state) {
+  try {
+    const raw = JSON.stringify(state);
+    if (useLS) window.localStorage.setItem(KEY, raw); else mem[KEY] = raw;
+  } catch (e) { /* ignore */ }
+}
+function statsDefaults() {
+  return { played: 0, bestGrade: 0, streak: 0, lastNo: null, history: [] };
+}
+
+/* record a finished daily result and update the streak */
+function recordResult(no, result) {
+  const s = loadStats();
+  if (s.lastNo === no) return s; /* already counted this puzzle */
+  s.played += 1;
+  s.bestGrade = Math.max(s.bestGrade, result.grade);
+  s.streak = (s.lastNo != null && no === s.lastNo + 1) ? s.streak + 1 : 1;
+  s.lastNo = no;
+  s.history.unshift({ no, grade: result.grade, score: result.score });
+  s.history = s.history.slice(0, 60);
+  saveStats(s);
+  return s;
+}
+const storageMode = () => (useLS ? "local" : "memory");
+
+/* ---- src/ui/app.js ---- */
+/* ============================================================
+   THE CUTLINE . app (orchestrator)
+   ------------------------------------------------------------
+   Wires the data, engine, and render layers into the two modes.
+
+   Mode A (daily and archive): the evergreen game. A verified
+   season, played 16 to 12 to 8 to Championship 4 to champion,
+   then graded and revealed. Ships first.
+
+   Mode B (live): the in season tentpole. Runs on the live feed
+   adapter, locks each round's picks at the green flag, and shows
+   the cutline updating from real points. Demo feed here; flip to
+   the Motorsport Stats feed at handoff.
+
+   Voice rule: short, plain, active. No dashes anywhere in copy.
+   Integrity rule: only fully verified seasons are ever scored.
+   The unit is the driver, never the manufacturer.
+   ============================================================ */
+
+
+
+
+
+
+
+
+
+
+
+
+
+const CONF_LEVELS = [
+  { v: 1, label: "Even" },
+  { v: 1.5, label: "1.5x" },
+  { v: 2, label: "2x" },
+];
+
+const RELATED = [
+  { kick: "F1 daily", name: "Two Seats", desc: "Build the grid. One lineup, every day.", href: "#" },
+  { kick: "F1 daily", name: "The Lineup", desc: "Draft the perfect ten driver roster.", href: "#" },
+  { kick: "NASCAR", name: "The Big One", desc: "Call the chaos at the superspeedway.", href: "#" },
+];
+
+function logoSrc() {
+  return (typeof window !== "undefined" && window.CUTLINE_LOGO) || "assets/logo.png";
+}
+
+/* ---------- app state ---------- */
+const App = {
+  root: null,
+  refs: {},
+  mode: "daily",       /* daily | archive | live */
+  bracket: null,
+  live: null,
+  toastTimer: null,
+};
+function mountApp(root) {
+  App.root = root;
+  buildChrome(root);
+  const stats = loadStats();
+  paintMeta(stats);
+  maybeWelcome();
+  startDaily();
+  track(EVENTS.GAME_START, { mode: "daily", dataVersion: DATA_VERSION, storage: storageMode() });
+}
+
+/* ---------- chrome ---------- */
+function buildChrome(root) {
+  clear(root);
+  root.appendChild(el("div", { class: "checker", "aria-hidden": "true" }));
+
+  const wrap = el("div", { class: "wrap" });
+
+  /* head */
+  const head = el("div", { class: "head" });
+  head.appendChild(el("div", { class: "presents" },
+    'motorsport.com <img class="logo-img" src="' + esc(logoSrc()) + '" alt="motorsport.com" /> presents'));
+  head.appendChild(el("h1", { class: "logo" }, "THE <em>CUT</em>LINE"));
+  head.appendChild(el("div", { class: "tagline" }, "Call the cuts. Crown the champion."));
+  head.appendChild(el("div", { class: "kick" }, "NASCAR playoff bracket"));
+  wrap.appendChild(head);
+
+  /* metarow */
+  const meta = el("div", { class: "metarow" });
+  const modeswitch = el("div", { class: "modeswitch", role: "group", "aria-label": "Game mode" });
+  const dailyBtn = el("button", { type: "button", "aria-pressed": "true" }, "Daily");
+  const liveBtn = el("button", { type: "button", "aria-pressed": "false" }, "Live");
+  dailyBtn.addEventListener("click", () => switchMode("daily"));
+  liveBtn.addEventListener("click", () => switchMode("live"));
+  modeswitch.appendChild(dailyBtn); modeswitch.appendChild(liveBtn);
+  meta.appendChild(modeswitch);
+
+  const noPill = el("div", { class: "pill" }, "No. <b>1</b>");
+  const streakPill = el("div", { class: "pill" }, "Streak <b>0</b>");
+  meta.appendChild(noPill); meta.appendChild(streakPill);
+
+  const help = el("button", { class: "help", type: "button" }, "How to play");
+  help.addEventListener("click", showHelp);
+  meta.appendChild(help);
+  wrap.appendChild(meta);
+
+  /* screens */
+  const play = el("div", { class: "screen active", id: "screen-play" });
+  const result = el("div", { class: "screen", id: "screen-result" });
+  const live = el("div", { class: "screen", id: "screen-live" });
+  wrap.appendChild(play); wrap.appendChild(result); wrap.appendChild(live);
+
+  /* ad slot */
+  wrap.appendChild(adSlot());
+
+  /* archive */
+  const archive = el("div", { id: "archive" });
+  wrap.appendChild(archive);
+
+  /* related rail */
+  wrap.appendChild(el("div", { class: "section-h" }, "More games"));
+  const rail = el("div", { class: "rail" });
+  RELATED.forEach(g => {
+    rail.appendChild(el("a", { class: "railcard", href: g.href },
+      '<div class="rg-k">' + esc(g.kick) + "</div>" +
+      '<div class="rg-n">' + esc(g.name) + "</div>" +
+      '<div class="rg-d">' + esc(g.desc) + "</div>"));
+  });
+  wrap.appendChild(rail);
+
+  /* footer */
+  wrap.appendChild(el("div", { class: "foot" },
+    'The Cutline is a game from motorsport.com. Results in the daily and archive are checked against official NASCAR results. ' +
+    'Driver track tendencies and entering point cushions shown while picking are modeled for context and do not affect scoring. ' +
+    'Data version ' + esc(DATA_VERSION) + "."));
+
+  root.appendChild(wrap);
+
+  /* modal + toast layers */
+  root.appendChild(buildModal());
+  const toast = el("div", { class: "toast", role: "status", "aria-live": "polite" });
+  root.appendChild(toast);
+
+  App.refs = {
+    play, result, live, archive, noPill, streakPill, toast,
+    modeswitch, dailyBtn, liveBtn,
+    modalBg: root.querySelector(".modal-bg"),
+    modalBody: root.querySelector(".mbox .mbody"),
+    modalTitle: root.querySelector(".mbox h2"),
+  };
+
+  renderArchive();
+}
+
+function adSlot() {
+  return el("div", { class: "adslot", role: "complementary", "aria-label": "Advertisement" },
+    '<div class="adk">Advertisement</div>' +
+    '<div class="adm" data-cutline-ad-slot="inline-1">Ad slot. Wire your ad tag to data-cutline-ad-slot.</div>');
+}
+
+function buildModal() {
+  const bg = el("div", { class: "modal-bg" });
+  const box = el("div", { class: "mbox", role: "dialog", "aria-modal": "true", "aria-labelledby": "mtitle" });
+  box.appendChild(el("button", { class: "mdismiss", type: "button", "aria-label": "Close" }, "\u00D7"));
+  box.appendChild(el("h2", { id: "mtitle" }, ""));
+  box.appendChild(el("div", { class: "mbody" }, ""));
+  const closeBtn = el("button", { class: "btn mclose", type: "button" }, "Got it");
+  box.appendChild(closeBtn);
+  bg.appendChild(box);
+  const close = () => bg.classList.remove("show");
+  box.querySelector(".mdismiss").addEventListener("click", close);
+  closeBtn.addEventListener("click", close);
+  bg.addEventListener("click", e => { if (e.target === bg) close(); });
+  document.addEventListener("keydown", e => { if (e.key === "Escape") close(); });
+  return bg;
+}
+
+function openModal(title, bodyHtml) {
+  App.refs.modalTitle.textContent = title;
+  App.refs.modalBody.innerHTML = bodyHtml;
+  App.refs.modalBg.classList.add("show");
+}
+
+function maybeWelcome() {
+  const stats = loadStats();
+  if (stats.played > 0) return;
+  showHelp(true);
+}
+
+function showHelp(isWelcome) {
+  track(EVENTS.HELP_OPEN, { welcome: isWelcome === true });
+  openModal(isWelcome === true ? "Welcome to The Cutline" : "How to play",
+    '<p>Every day you get one real NASCAR playoff field of 16 drivers. Your job is to call the cuts.</p>' +
+    '<div class="rule">Round of 16: pick the <b>12</b> who survive.</div>' +
+    '<div class="rule">Round of 12: pick the <b>8</b> who survive.</div>' +
+    '<div class="rule">Round of 8: pick the <b>Championship 4</b>.</div>' +
+    '<div class="rule">Then crown your <b>champion</b>.</div>' +
+    '<p>Drivers above the cutline advance. Drivers below it are out. Win the race in a round and you are locked in no matter the points.</p>' +
+    '<p>Your grade is accuracy, round weighted, with the champion worth the most. Add a confidence bet on a round to multiply its points, but you pay the stake on what you miss. Call a driver who was below the line and still advanced for an upset bonus.</p>' +
+    '<p>The daily rotates through fully verified seasons only. The archive holds the complete elimination era, 2014 through 2025.</p>');
+}
+
+function toast(msg) {
+  const t = App.refs.toast;
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(App.toastTimer);
+  App.toastTimer = setTimeout(() => t.classList.remove("show"), 2600);
+}
+
+function paintMeta(stats) {
+  const daily = pickDaily();
+  App.refs.noPill.innerHTML = "No. <b>" + daily.no + "</b>";
+  App.refs.streakPill.innerHTML = "Streak <b>" + (stats.streak || 0) + "</b>";
+}
+
+function showScreen(which) {
+  ["play", "result", "live"].forEach(k => {
+    App.refs[k].classList.toggle("active", k === which);
+  });
+}
+
+/* ---------- mode switch ---------- */
+function switchMode(mode) {
+  if (mode === App.mode && mode !== "archive") return;
+  App.mode = mode;
+  App.refs.dailyBtn.setAttribute("aria-pressed", mode !== "live" ? "true" : "false");
+  App.refs.liveBtn.setAttribute("aria-pressed", mode === "live" ? "true" : "false");
+  track(EVENTS.MODE_SWITCH, { mode });
+  if (mode === "live") { showScreen("live"); renderLive(); }
+  else { showScreen("play"); if (!App.bracket) startDaily(); }
+}
+
+/* ---------- Mode A: daily + archive ---------- */
+function startDaily() {
+  const daily = pickDaily();
+  const season = seasonByYear(daily.year);
+  App.mode = "daily";
+  App.bracket = startBracket(season, { mode: "daily", no: daily.no });
+  showScreen("play");
+  renderPlay();
+}
+
+function startSeason(year) {
+  const season = seasonByYear(year);
+  if (!isFullyVerified(season)) { showFinalists(season); return; }
+  App.mode = "archive";
+  App.bracket = startBracket(season, { mode: "archive", no: puzzleNumber() });
+  track(EVENTS.GAME_START, { mode: "archive", year });
+  showScreen("play");
+  renderPlay();
+  App.refs.play.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function renderPlay() {
+  const state = App.bracket;
+  const node = App.refs.play;
+  clear(node);
+
+  /* brief strip */
+  const verified = isFullyVerified(state.season);
+  const brief = el("div", { class: "brief" },
+    '<div class="bl">' + (state.mode === "daily" ? "Today's field" : "Archive field") + "</div>" +
+    '<div class="byr">' + state.season.year + " playoffs</div>" +
+    '<div class="bsub">' + esc(state.season.finale ? "Finale at " + state.season.finale + ". " : "") +
+    "Sixteen drivers in. One champion out.</div>");
+  node.appendChild(brief);
+
+  /* stepper */
+  const stepper = el("div", { class: "stepper" });
+  STAGES.forEach((st, i) => {
+    stepper.appendChild(el("div", {
+      class: "step" + (i === state.stage ? " on" : i < state.stage ? " done" : ""),
+    }, esc(st.round.replace("Round of ", "Ro").replace("Championship 4", "Champ 4"))));
+  });
+  node.appendChild(stepper);
+
+  const headHost = el("div"); node.appendChild(headHost);
+  renderRoundHead(headHost, state);
+
+  const surfaceHost = el("div"); node.appendChild(surfaceHost);
+
+  /* confidence selector for the current round */
+  const confHost = el("div"); node.appendChild(confHost);
+
+  const actionHost = el("div"); node.appendChild(actionHost);
+
+  const refresh = () => {
+    renderRoundHead(headHost, state);
+    renderConfidence(confHost, state);
+    renderAction(actionHost, state, surfaceHost, headHost, confHost);
+  };
+  renderPickSurface(surfaceHost, state, refresh);
+  refresh();
+}
+
+function renderConfidence(node, state) {
+  const st = currentStage(state);
+  const key = st.key === "champ" ? "champion" : st.key;
+  const current = state.confidence[key] || 1;
+  clear(node);
+  const wrap = el("div", { class: "metarow", style: "margin-top:12px", role: "group", "aria-label": "Confidence bet for this round" });
+  wrap.appendChild(el("span", { class: "pill" }, "Confidence"));
+  CONF_LEVELS.forEach(c => {
+    const b = el("button", {
+      class: "help", type: "button",
+      "aria-pressed": current === c.v ? "true" : "false",
+      style: current === c.v ? "color:var(--bg);background:var(--amber);border-color:var(--amber)" : "",
+    }, c.label);
+    b.addEventListener("click", () => { state.confidence[key] = c.v; renderConfidence(node, state); });
+    wrap.appendChild(b);
+  });
+  node.appendChild(wrap);
+}
+
+function renderAction(node, state, surfaceHost, headHost, confHost) {
+  const st = currentStage(state);
+  clear(node);
+  const bar = el("div", { class: "actionbar" });
+  const ready = canAdvance(state);
+  const isFinal = st.key === "champ";
+  const label = isFinal ? "Lock in champion" : "Confirm cut, next round";
+  const btn = el("button", { class: "btn", type: "button" }, label);
+  btn.disabled = !ready;
+  btn.addEventListener("click", () => {
+    if (st.key === "champ") track(EVENTS.CHAMPION_PICK, { year: state.season.year, pick: state.selection[0] });
+    const r = advance(state);
+    if (!r.ok) { toast("Pick " + st.keep + " to advance."); return; }
+    if (r.done) { finishBracket(state); return; }
+    track(EVENTS.ROUND_ADVANCE, { year: state.season.year, stage: st.key });
+    renderRoundHead(headHost, state);
+    renderConfidence(confHost, state);
+    renderPickSurface(surfaceHost, state, () => {
+      renderRoundHead(headHost, state);
+      renderConfidence(confHost, state);
+      renderAction(node, state, surfaceHost, headHost, confHost);
+    });
+    renderAction(node, state, surfaceHost, headHost, confHost);
+    App.refs.play.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+  bar.appendChild(btn);
+  node.appendChild(bar);
+}
+
+/* model the below the line set for upset bonus from seeds, flagged.
+   a driver who survived but entered seeded outside the keep count
+   is treated as having been below the line. honest model, never
+   fabricates a points value. */
+function modeledBelowLine(season) {
+  const out = {};
+  const stages = [
+    { key: "ro16", cut: 16, keep: 12 },
+    { key: "ro12", cut: 12, keep: 8 },
+    { key: "ro8", cut: 8, keep: 4 },
+  ];
+  for (const s of stages) {
+    const survivors = season.drivers.filter(d => d.out < s.cut)
+      .slice().sort((a, b) => (a.seed || 99) - (b.seed || 99));
+    /* the lowest seeded survivors are the modeled upsets */
+    const below = new Set(survivors.slice(s.keep - 2 < 0 ? 0 : s.keep - 2).map(d => d.n));
+    out[s.key] = below;
+  }
+  return out;
+}
+
+function finishBracket(state) {
+  const picks = toPicks(state);
+  const belowLine = modeledBelowLine(state.season);
+  const result = scoreBracket({ season: state.season, picks, confidence: state.confidence, belowLine });
+  track(EVENTS.SUBMIT, { year: state.season.year, grade: result.grade, score: result.score, mode: state.mode });
+
+  if (state.mode === "daily") {
+    const stats = recordResult(state.no, result);
+    App.refs.streakPill.innerHTML = "Streak <b>" + stats.streak + "</b>";
+  }
+  renderResult(state, result, belowLine);
+}
+
+function renderResult(state, result, belowLine) {
+  const node = App.refs.result;
+  clear(node);
+  showScreen("result");
+  track(EVENTS.REVEAL_VIEW, { year: state.season.year });
+
+  const v = el("div", { class: "verdict " + result.tag },
+    '<div class="grade">' + result.grade + "%</div>" +
+    '<div class="glabel">' + esc(result.label) + "</div>" +
+    '<div class="ghead">' + esc(result.headline) + "</div>" +
+    '<div class="pct">Estimated top ' + Math.max(1, 100 - result.percentile) + "% of brackets</div>");
+  const sl = el("div", { class: "scoreline" });
+  sl.appendChild(el("div", { class: "scorebox" }, '<div class="v">' + result.score + '</div><div class="k">Score</div>'));
+  sl.appendChild(el("div", { class: "scorebox" }, '<div class="v">' + result.grade + '%</div><div class="k">Accuracy</div>'));
+  sl.appendChild(el("div", { class: "scorebox" }, '<div class="v">' + (result.championOK ? "Yes" : "No") + '</div><div class="k">Champion</div>'));
+  v.appendChild(sl);
+  node.appendChild(v);
+
+  node.appendChild(el("div", { class: "section-h" }, "What really happened"));
+  const revealHost = el("div"); node.appendChild(revealHost);
+  renderReveal(revealHost, state, result, belowLine);
+
+  node.appendChild(el("div", { class: "section-h" }, "Share"));
+  const shareHost = el("div"); node.appendChild(shareHost);
+  renderShare(shareHost, state, result, belowLine, (ok) => {
+    toast(ok ? "Result copied." : "Copy not available. Select and copy the grid.");
+    track(EVENTS.SHARE, { year: state.season.year, grade: result.grade });
+  });
+
+  node.appendChild(el("div", { class: "section-h" }, "Full bracket"));
+  const wideHost = el("div"); node.appendChild(wideHost);
+  renderWideBracket(wideHost, state);
+
+  const bar = el("div", { class: "actionbar two" });
+  const again = el("button", { class: "btn ghost", type: "button" }, "Play the archive");
+  again.addEventListener("click", () => { showScreen("play"); App.refs.archive.scrollIntoView({ behavior: "smooth" }); });
+  const back = el("button", { class: "btn ghost", type: "button" }, "Back to today");
+  back.addEventListener("click", () => { startDaily(); });
+  bar.appendChild(back); bar.appendChild(again);
+  node.appendChild(bar);
+
+  node.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+/* ---------- archive ---------- */
+function renderArchive() {
+  const node = App.refs.archive;
+  clear(node);
+  node.appendChild(el("div", { class: "section-h" }, "The archive . 2014 to 2025"));
+  const grid = el("div", { class: "arch-grid" });
+  allYears().forEach(year => {
+    const s = seasonByYear(year);
+    const full = isFullyVerified(s);
+    const champ = s.drivers.find(d => d.champ);
+    const card = el("button", {
+      class: "arch-card" + (full ? "" : " locked"), type: "button",
+      "aria-label": year + " season, champion " + (champ ? champ.n : "") + (full ? ", playable" : ", finalists view"),
+    },
+      '<div class="ay">' + year + "</div>" +
+      '<div class="ac">Champion <span>' + esc(champ ? champ.n : "") + "</span></div>" +
+      '<div class="atag ' + (full ? "full" : "part") + '">' + (full ? "Play bracket" : "Finalists only") + "</div>");
+    card.addEventListener("click", () => {
+      track(EVENTS.ARCHIVE_OPEN, { year, verified: full });
+      startSeason(year);
+    });
+    grid.appendChild(card);
+  });
+  node.appendChild(grid);
+}
+
+/* finalists view for a pending season: champion plus the four,
+   clearly flagged, never asserting unverified intermediate cuts. */
+function showFinalists(season) {
+  const four = season.drivers.filter(d => d.out === 4);
+  const champ = four.find(d => d.champ);
+  const rows = four.slice().sort((a, b) => (a.champ ? -1 : 0) - (b.champ ? -1 : 0))
+    .map(d => '<div class="rule">' + (d.champ ? "<b>Champion: " + esc(d.n) + "</b>" : esc(d.n)) + "</div>").join("");
+  openModal(season.year + " finalists",
+    "<p>The full bracket for " + season.year + " is not verified end to end yet, so it is not playable. " +
+    "The Championship 4 and the champion are confirmed.</p>" + rows +
+    '<p class="visually-quiet">Verified intermediate rounds arrive from Motorsport Stats. Until then this season stays out of the scored daily.</p>');
+}
+
+/* ---------- Mode B: live ---------- */
+function renderLive() {
+  const node = App.refs.live;
+  clear(node);
+  const feed = App.live || (App.live = demoFeed());
+  const meta = feed.meta();
+
+  const banner = el("div", { class: "brief" },
+    '<div class="bl">Live mode</div>' +
+    '<div class="byr">' + esc(meta.label) + "</div>" +
+    '<div class="bsub">Picks lock at the green flag of each round. The cutline updates from real points as the round runs.</div>' +
+    (FEED_SOURCE !== "motorsport-stats"
+      ? '<span class="flag">Demo feed. Real season wires in at handoff.</span>' : ""));
+  node.appendChild(banner);
+
+  /* round selector by lock state */
+  const rounds = feed.rounds();
+  node.appendChild(el("div", { class: "section-h" }, "Rounds"));
+  const list = el("div", { class: "roundbreak" });
+  rounds.forEach(r => {
+    const ls = lockState(r);
+    const ttl = timeToLock(r);
+    const when = ls === "open"
+      ? (ttl != null ? "Locks in " + fmtDur(ttl) : "Open")
+      : ls === "locked" ? "Locked" : "Scheduled";
+    const row = el("div", { class: "rbrow" },
+      '<span class="rl">' + esc(r.label) + "</span>" +
+      '<span class="rh">' + r.races.filter(x => x.done).length + " of " + r.races.length + " races run</span>" +
+      '<span class="rn" style="font-size:13px;color:' + (ls === "open" ? "var(--green)" : "var(--muted)") + '">' + esc(when) + "</span>");
+    list.appendChild(row);
+  });
+  node.appendChild(list);
+
+  /* live cutline for the open round */
+  const open = rounds.find(r => lockState(r) === "open" && r.key !== "finale") || rounds[0];
+  node.appendChild(el("div", { class: "section-h" }, "Live cutline . " + esc(open.label)));
+  const standings = feed.standings(open.key).map(s => ({ name: s.name, car: s.car, seed: s.seed, points: s.points, won: s.won }));
+  const cut = computeCutline(standings, open.key);
+
+  const board = el("div", { class: "cutboard" });
+  const ranked = standings.slice().sort((a, b) => {
+    const av = a.won ? Infinity : a.points, bv = b.won ? Infinity : b.points;
+    return bv - av;
+  });
+  const above = el("div"), below = el("div");
+  let lineDrawn = false;
+  ranked.forEach(d => {
+    const adv = cut.advancing.has(d.name);
+    if (!adv && !lineDrawn) {
+      board.appendChild(above);
+      board.appendChild(el("div", { class: "cutline", role: "separator" },
+        '<span class="ctag">The cutline</span>' +
+        '<span class="ctight">' + (cut.lastIn ? "last in " + esc(cut.lastIn.name) : "") + "</span>"));
+      lineDrawn = true;
+    }
+    const cv = cut.cushions.get(d.name);
+    const cls = cv === Infinity ? "lock" : cv > 0 ? "pos" : cv < 0 ? "neg" : "";
+    const row = el("div", { class: "drow" + (adv ? " on" : "") },
+      '<span class="seed">' + (d.seed || "") + "</span>" +
+      '<span><span class="nm">' + esc(d.name) + '<span class="car">#' + esc(d.car) + "</span></span></span>" +
+      '<span class="cushion ' + cls + '">' + esc(cushionLabel(cv)) + "</span>");
+    (lineDrawn ? below : above).appendChild(row);
+  });
+  board.appendChild(below);
+  node.appendChild(board);
+
+  /* lock note */
+  if (lockState(open) === "open") {
+    track(EVENTS.WEEKLY_LOCK, { round: open.key, state: "open" });
+  }
+
+  node.appendChild(el("div", { class: "section-h" }, "Leaderboard"));
+  node.appendChild(el("div", { class: "adslot" },
+    '<div class="adk">Live standings</div>' +
+    '<div class="adm">The weekly leaderboard populates from submitted brackets once the season is live.</div>'));
+}
+
+function fmtDur(ms) {
+  const d = Math.floor(ms / 86400000);
+  const h = Math.floor((ms % 86400000) / 3600000);
+  if (d > 0) return d + "d " + h + "h";
+  const m = Math.floor((ms % 3600000) / 60000);
+  return h + "h " + m + "m";
+}
+
+
+/* ---- bootstrap ---- */
+(function () {
+  function boot() {
+    var root = document.getElementById("the-cutline");
+    if (!root) { root = document.createElement("div"); root.id = "the-cutline"; document.body.appendChild(root); }
+    mountApp(root);
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
+  else boot();
+})();
+
+})();
+</script>
+</body>
+</html>
