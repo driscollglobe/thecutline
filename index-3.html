@@ -1,0 +1,2396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Big One &middot; motorsport.com</title>
+<meta name="description" content="A daily superspeedway push your luck game from motorsport.com. Bank the points. Beat the wreck.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Fredoka:wght@500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* styles/tokens.css */
+/* ============================================================
+   tokens.css  -  the design system inherited from Two Seats
+   Exact tokens so The Big One reads as one of the family.
+   This game's accent is the hot orange.
+   ============================================================ */
+:root{
+  --bg:#0d1117; --panel:#161c24; --panel2:#1d2530; --raised:#222c38;
+  --line:#28323f; --line2:#34404f;
+  --text:#eef2f6; --muted:#8a97a8; --faint:#5c6776;
+  --amber:#f2e500; --amber2:#fff44d;
+  --green:#37d99a; --red:#ff5d6c; --cyan:#3fd8e2; --hot:#ff7a3c;
+  --disp:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --body:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --maxw:560px;
+}
+*{box-sizing:border-box}
+html{margin:0;min-height:100%;background:var(--bg);-webkit-text-size-adjust:100%}
+body{margin:0;color:var(--text);font-family:var(--body);-webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility}
+button,select{font-family:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--amber);outline-offset:2px;border-radius:4px}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
+  clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+/* checkered start/finish signature stripe */
+.checker{height:10px;width:100%;
+  background-image:
+    linear-gradient(45deg,#0d1117 25%,transparent 25%,transparent 75%,#0d1117 75%),
+    linear-gradient(45deg,#0d1117 25%,#e9edf2 25%,#e9edf2 75%,transparent 75%);
+  background-size:14px 14px;background-position:0 0,7px 7px;background-color:#e9edf2;opacity:.9}
+
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 16px}
+
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:.001ms !important;animation-iteration-count:1 !important;
+    transition-duration:.001ms !important;scroll-behavior:auto !important}
+}
+
+
+/* styles/game.css */
+/* ============================================================
+   game.css  -  components and screens for The Big One
+   Mobile first. Two heroes carry the screen: the banked points
+   number and the rising danger meter. Everything else stays
+   quiet. The one aesthetic risk we spend is the live pack and
+   wreck visual, which earns its place by making the read legible.
+   ============================================================ */
+
+/* ---- the motorsport.com wordmark, recreated faithfully ----
+   The brand wordmark is lowercase, heavy, and fully amber on the
+   dark field. We render it in type rather than ship a raster so it
+   stays crisp at any size. Used in the brand head and the footer. */
+.msword{font-family:"Fredoka","Inter",system-ui,sans-serif;font-weight:600;letter-spacing:-.01em;
+  color:var(--amber);text-transform:lowercase;line-height:1}
+.msword.sm{font-size:16px}
+.msword.foot{font-size:21px}
+
+/* ---- brand head ---- */
+.ghead{padding:22px 0 6px;text-align:center}
+.presents{font-size:13px;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:6px}
+h1.logo{margin:12px 0 0;font-family:var(--disp);font-weight:700;font-size:52px;line-height:.88;
+  text-transform:uppercase;letter-spacing:.01em}
+h1.logo em{font-style:normal;color:var(--hot)}
+.tagline{font-family:var(--disp);font-weight:500;font-size:16px;letter-spacing:.03em;
+  text-transform:uppercase;margin-top:12px}
+.kick{font-family:var(--disp);font-size:11px;letter-spacing:.26em;color:var(--hot);
+  text-transform:uppercase;font-weight:700;margin-top:10px}
+
+/* ---- meta row ---- */
+.metarow{display:flex;align-items:center;gap:8px;margin:16px 0 10px;flex-wrap:wrap}
+.pill{font-family:var(--disp);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted);border:1px solid var(--line);border-radius:20px;padding:6px 11px;white-space:nowrap}
+.pill b{color:var(--amber2)}
+.pill.live{border-color:var(--hot);color:var(--hot)}
+.iconbtns{margin-left:auto;display:flex;gap:6px}
+.ibtn{font-family:var(--disp);font-size:11.5px;letter-spacing:.06em;color:var(--muted);
+  background:none;border:1px solid var(--line);border-radius:6px;padding:7px 10px;text-transform:uppercase}
+.ibtn:hover{color:var(--text);border-color:var(--line2)}
+.ibtn[aria-pressed="true"]{color:var(--hot);border-color:var(--hot)}
+
+/* ---- track line ---- */
+.trackline{font-family:var(--disp);font-size:13px;letter-spacing:.04em;text-transform:uppercase;
+  color:var(--muted);text-align:center;margin-bottom:4px}
+.trackline b{color:var(--text)}
+
+/* ---- dashboard ---- */
+.dash{background:linear-gradient(180deg,#1d2530,#161c24);border:1px solid var(--line2);
+  border-radius:16px;padding:18px 16px;margin-top:8px;box-shadow:0 14px 34px rgba(0,0,0,.4)}
+.dash.wreck{border-color:var(--red);animation:shake .4s}
+.dash.safe{border-color:var(--green)}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}
+  40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+
+.bankwrap{text-align:center}
+.banklabel{font-family:var(--disp);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint)}
+.bank{font-family:var(--disp);font-weight:700;font-size:64px;line-height:.9;color:var(--amber)}
+.bank .u{font-size:22px;color:var(--muted);margin-left:4px}
+.bankhint{font-size:11.5px;color:var(--faint);margin-top:2px}
+
+.statline{display:flex;justify-content:center;gap:18px;margin-top:10px}
+.stat{text-align:center;min-width:54px}
+.stat .sv{font-family:var(--disp);font-size:22px;font-weight:700}
+.stat .sl{font-family:var(--disp);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint)}
+
+/* ---- pack and wreck visual ---- */
+.packbox{margin-top:14px;border:1px solid var(--line);border-radius:11px;background:#0c1218;overflow:hidden}
+.packbox svg{display:block;width:100%;height:auto}
+
+/* ---- danger meter ---- */
+.danger{margin-top:14px}
+.danger .dl{display:flex;justify-content:space-between;font-family:var(--disp);font-size:11px;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.dbar{height:12px;border-radius:7px;background:var(--line2);overflow:hidden;position:relative}
+.dbar i{display:block;height:100%;width:0;
+  background:linear-gradient(90deg,var(--green),var(--amber) 45%,var(--hot) 72%,var(--red));
+  transition:width .25s ease}
+.dbar .mark{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--text);opacity:.45}
+.dword{font-family:var(--disp);font-weight:700;text-transform:uppercase}
+
+/* ---- feed ---- */
+.feed{margin-top:14px;max-height:104px;overflow:auto;border-top:1px solid var(--line);padding-top:10px}
+.feed div{font-size:12.5px;color:var(--muted);padding:3px 0;line-height:1.4}
+.feed div.hot{color:var(--hot)}
+.feed div.go{color:var(--green)}
+.feed div.bad{color:var(--red);font-weight:600}
+.feed div.stage{color:var(--cyan)}
+
+.howline{font-family:var(--disp);font-size:12.5px;letter-spacing:.04em;text-transform:uppercase;
+  color:var(--muted);text-align:center;margin:14px 0 0}
+.howline b{color:var(--text)}
+
+/* ---- posture controls ---- */
+.postures{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:14px}
+.pbtn{font-family:var(--disp);font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+  background:var(--panel);color:var(--muted);border:1px solid var(--line);border-radius:10px;padding:11px 6px;line-height:1.1}
+.pbtn .psub{display:block;font-family:var(--body);font-size:10px;font-weight:500;letter-spacing:0;
+  text-transform:none;color:var(--faint);margin-top:3px}
+.pbtn[aria-pressed="true"]{border-color:var(--hot);color:var(--text);background:var(--raised)}
+.pbtn:disabled{opacity:.4}
+
+/* ---- main controls ---- */
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.controls.final{grid-template-columns:1fr 1fr 1fr}
+.cbtn{font-family:var(--disp);font-size:18px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+  border:0;border-radius:12px;padding:18px 10px;line-height:1.05}
+.stay{background:var(--green);color:#06321f}
+.stay:hover{filter:brightness(1.08)}
+.pit{background:var(--amber);color:#2a2700}
+.pit:hover{filter:brightness(1.08)}
+.win{background:var(--hot);color:#3a1500}
+.win:hover{filter:brightness(1.08)}
+.cbtn:disabled{opacity:.4;cursor:not-allowed}
+.cbtn .sub{display:block;font-family:var(--body);font-size:11px;font-weight:500;letter-spacing:0;
+  text-transform:none;margin-top:3px;opacity:.85}
+
+/* ---- result ---- */
+.result{text-align:center;margin-top:8px;background:linear-gradient(180deg,#1d2530,#161c24);
+  border:1px solid var(--line2);border-radius:16px;padding:20px 16px;box-shadow:0 14px 34px rgba(0,0,0,.4)}
+.rtag{display:inline-block;font-family:var(--disp);font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+  font-weight:700;padding:6px 13px;border-radius:6px;margin-bottom:10px}
+.rtag.wint{background:var(--green);color:#06321f}
+.rtag.jack{background:var(--amber);color:#2a2700}
+.rtag.bust{background:var(--red);color:#3a000a}
+.rhead{font-family:var(--disp);font-size:28px;font-weight:700;text-transform:uppercase;line-height:1}
+.rbank{font-family:var(--disp);font-weight:700;font-size:56px;line-height:.9;color:var(--amber);margin-top:8px}
+.rbank .u{font-size:20px;color:var(--muted);margin-left:3px}
+.rsub{font-size:14px;color:var(--muted);margin-top:8px;line-height:1.55}
+.rsub b{color:#fff}
+.rpct{font-size:12.5px;color:var(--cyan);margin-top:8px}
+.rmodeled{font-size:11px;color:var(--faint);margin-top:6px;font-style:italic}
+.resbtns{display:flex;gap:9px;margin-top:16px}
+.resbtns button{flex:1;font-family:var(--disp);font-size:13px;font-weight:700;letter-spacing:.06em;
+  text-transform:uppercase;border-radius:10px;padding:13px}
+.shareb{background:var(--amber);color:#0d1117;border:0}
+.shareb:hover{background:var(--amber2)}
+.ghostb{background:transparent;color:var(--text);border:1px solid var(--line2)}
+.ghostb:hover{border-color:var(--hot);color:var(--hot)}
+
+/* ---- generic panel / screen ---- */
+.screen{margin-top:8px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 16px;margin-top:10px}
+.panel h2{font-family:var(--disp);font-size:18px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin:0 0 12px}
+.backrow{display:flex;align-items:center;margin-top:12px}
+
+/* ---- career stats ---- */
+.statgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.scard{background:var(--panel2);border:1px solid var(--line);border-radius:11px;padding:13px 10px;text-align:center}
+.scard .n{font-family:var(--disp);font-weight:700;font-size:30px;line-height:1;color:var(--amber)}
+.scard .l{font-family:var(--disp);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-top:4px}
+
+/* ---- distribution ---- */
+.distrib{margin-top:6px}
+.drow{display:grid;grid-template-columns:62px 1fr 34px;align-items:center;gap:8px;margin:5px 0}
+.drow .dk{font-family:var(--disp);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.dtrack{height:14px;border-radius:4px;background:var(--line2);overflow:hidden}
+.dtrack i{display:block;height:100%;background:linear-gradient(90deg,var(--amber),var(--hot))}
+.dtrack i.you{background:linear-gradient(90deg,var(--green),var(--cyan))}
+.drow .dv{font-family:var(--disp);font-size:12px;color:var(--faint);text-align:right}
+
+/* ---- leaderboard ---- */
+.lbrow{display:grid;grid-template-columns:34px 1fr auto;align-items:center;gap:10px;
+  padding:9px 11px;border-radius:9px;background:var(--panel2);border:1px solid var(--line);margin:6px 0}
+.lbrow.you{border-color:var(--hot);background:var(--raised)}
+.lbrow .rk{font-family:var(--disp);font-weight:700;font-size:16px;color:var(--muted);text-align:center}
+.lbrow .nm{font-family:var(--disp);font-size:15px;letter-spacing:.02em;text-transform:uppercase}
+.lbrow.you .nm{color:var(--hot)}
+.lbrow .bk{font-family:var(--disp);font-weight:700;font-size:17px;color:var(--amber)}
+
+/* ---- ad slot and related games rail ---- */
+.adslot{margin:18px 0 4px;border:1px dashed var(--line2);border-radius:10px;min-height:90px;
+  display:flex;align-items:center;justify-content:center;color:var(--faint);font-size:11px;
+  letter-spacing:.14em;text-transform:uppercase;font-family:var(--disp)}
+.rail{margin:18px 0 4px}
+.railhead{font-family:var(--disp);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin-bottom:9px}
+.railgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.railcard{display:block;text-decoration:none;background:var(--panel);border:1px solid var(--line);
+  border-radius:11px;padding:13px 13px;color:var(--text)}
+.railcard:hover{border-color:var(--hot)}
+.railcard .rn{font-family:var(--disp);font-weight:700;font-size:17px;text-transform:uppercase;line-height:1}
+.railcard .rd{font-size:11.5px;color:var(--muted);margin-top:4px;line-height:1.4}
+.railcard .rt{font-family:var(--disp);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--hot);margin-top:7px}
+
+/* ---- footer ---- */
+.foot{text-align:center;color:var(--faint);font-size:11px;padding:20px 16px 38px;line-height:1.7}
+.foot .msword{vertical-align:-3px;margin:0 2px}
+.foot a{color:var(--muted);text-decoration:none}
+.foot a:hover{color:var(--hot)}
+
+/* ---- modals ---- */
+.mback{position:fixed;inset:0;background:rgba(6,9,13,.74);display:none;align-items:center;
+  justify-content:center;z-index:60;padding:16px}
+.mback.on{display:flex}
+.mbox{width:100%;max-width:440px;background:var(--bg);border:1px solid var(--line2);border-radius:16px;
+  padding:24px 22px;max-height:90vh;overflow:auto}
+.mbox .wl{font-family:var(--disp);font-weight:700;font-size:30px;text-transform:uppercase;line-height:.9;text-align:center}
+.mbox .wl em{font-style:normal;color:var(--hot)}
+.mbox .wh{font-family:var(--disp);font-size:16px;font-weight:600;text-transform:uppercase;margin:13px 0 16px;text-align:center;color:var(--muted)}
+.wlist{list-style:none;margin:0 0 20px;padding:0;text-align:left;display:flex;flex-direction:column;gap:11px}
+.wlist li{position:relative;padding-left:24px;font-size:14px;line-height:1.5;color:#cfd6de}
+.wlist li::before{content:"";position:absolute;left:2px;top:6px;width:9px;height:9px;border-radius:2px;background:var(--hot);transform:rotate(45deg)}
+.wlist li b{color:#fff}
+.wcta{display:block;width:100%;font-family:var(--disp);font-size:16px;font-weight:700;letter-spacing:.06em;
+  text-transform:uppercase;color:#2a2700;background:var(--amber);border:0;border-radius:12px;padding:15px}
+.wcta:hover{background:var(--amber2)}
+
+/* mode menu */
+.modelist{display:flex;flex-direction:column;gap:9px;margin:4px 0 8px}
+.modeopt{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--panel);
+  border:1px solid var(--line);border-radius:11px;padding:13px 14px;color:var(--text)}
+.modeopt:hover{border-color:var(--hot)}
+.modeopt .mi{font-family:var(--disp);font-weight:700;font-size:13px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--hot);border:1px solid var(--hot);border-radius:6px;padding:5px 8px;min-width:62px;text-align:center}
+.modeopt .mt{font-family:var(--disp);font-size:17px;font-weight:700;text-transform:uppercase;line-height:1}
+.modeopt .md{font-size:11.5px;color:var(--muted);margin-top:2px;line-height:1.4}
+.replaynote{font-size:11px;color:var(--faint);font-style:italic;margin-top:8px;line-height:1.5}
+.mclose{display:block;width:100%;margin-top:8px;font-family:var(--disp);font-size:13px;font-weight:700;
+  letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:transparent;
+  border:1px solid var(--line2);border-radius:10px;padding:12px}
+.mclose:hover{color:var(--text)}
+
+/* ---- toast ---- */
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--panel2);
+  border:1px solid var(--line2);color:var(--text);font-size:13px;padding:11px 16px;border-radius:10px;
+  opacity:0;pointer-events:none;transition:opacity .2s;z-index:70;max-width:90vw;text-align:center}
+.toast.on{opacity:1}
+
+/* ---- smoke puff animation on the wreck ---- */
+@keyframes puff{0%{opacity:.0;transform:scale(.4)}30%{opacity:.85}100%{opacity:0;transform:scale(1.8)}}
+.smoke{animation:puff 1.1s ease-out forwards}
+
+.hidden{display:none !important}
+
+@media (min-width:600px){
+  h1.logo{font-size:60px}
+  .bank{font-size:72px}
+}
+
+</style>
+</head>
+<body>
+<div class="checker"></div>
+
+<div class="wrap">
+
+  <!-- brand head -->
+  <header class="ghead">
+    <div class="presents"><span class="msword sm">motorsport.com</span> presents</div>
+    <h1 class="logo">THE <em>BIG</em> ONE</h1>
+    <div class="tagline">Bank the points. Beat the wreck.</div>
+    <div class="kick">Daily game &middot; Superspeedway</div>
+  </header>
+
+  <!-- meta row -->
+  <div class="metarow">
+    <span class="pill" id="noPill">No. <b id="pNo">1</b></span>
+    <span class="pill" id="modePill">Daily</span>
+    <span class="pill">Streak <b id="streakPill">0</b></span>
+    <span class="iconbtns">
+      <button class="ibtn" id="modeBtn" aria-haspopup="dialog">Modes</button>
+      <button class="ibtn" id="statsBtn">Stats</button>
+      <button class="ibtn" id="soundBtn" aria-pressed="false">Sound</button>
+      <button class="ibtn" id="helpBtn" aria-haspopup="dialog">How to play</button>
+    </span>
+  </div>
+
+  <p class="trackline" id="trackline">Loading today's race.</p>
+
+  <!-- ===== PLAY SCREEN ===== -->
+  <section id="screen_play" class="screen" aria-label="Race dashboard">
+    <div class="dash" id="dash">
+      <div class="bankwrap">
+        <div class="banklabel">Points you would lock in</div>
+        <div class="bank"><span id="bank">0</span><span class="u">pts</span></div>
+        <div class="bankhint">Stay out to raise it. Pit to keep it.</div>
+      </div>
+
+      <div class="statline">
+        <div class="stat"><div class="sv" id="pos">P12</div><div class="sl">Running</div></div>
+        <div class="stat"><div class="sv"><span id="lapNow">10</span><span style="color:var(--faint)">/<span id="totalLaps">200</span></span></div><div class="sl">Lap</div></div>
+        <div class="stat"><div class="sv" id="laps">19</div><div class="sl">Rounds left</div></div>
+      </div>
+
+      <div class="packbox" id="pack" aria-live="off"></div>
+
+      <div class="danger">
+        <div class="dl"><span>Wreck danger</span><span class="dword" id="dword">Calm</span></div>
+        <div class="dbar"><i id="dbar"></i><span class="mark" id="dmark"></span></div>
+      </div>
+
+      <div class="feed" id="feed" aria-label="Race feed"></div>
+
+      <p class="howline">Stay out to score more. Pit before the Big One. Beat the target.</p>
+
+      <div class="postures" id="postures" role="group" aria-label="Driving posture">
+        <button class="pbtn" id="posture_hold" aria-pressed="true">Hold<span class="psub">steady, balanced</span></button>
+        <button class="pbtn" id="posture_push" aria-pressed="false">Make a move<span class="psub">gain spots, more risk</span></button>
+        <button class="pbtn" id="posture_drop" aria-pressed="false">Drop back<span class="psub">safer, lose spots</span></button>
+      </div>
+
+      <div class="controls" id="controls">
+        <button class="cbtn stay" id="stayBtn">Stay out<span class="sub">bank more, risk it</span><span id="stayHint" class="sr-only"></span></button>
+        <button class="cbtn win" id="winBtn" style="display:none">Go for the win<span class="sub">all in on the last lap</span></button>
+        <button class="cbtn pit" id="pitBtn">Pit now<span class="sub">lock it in, safe</span></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== RESULT SCREEN ===== -->
+  <section id="screen_result" class="screen hidden" aria-label="Result">
+    <div class="result">
+      <span class="rtag" id="rTag"></span>
+      <div class="rhead" id="rHead"></div>
+      <div class="rbank" id="rBank"></div>
+      <div class="rsub" id="rSub"></div>
+      <div class="bankhint" id="rBench"></div>
+      <div class="rpct" id="rPct"></div>
+      <div class="rmodeled" id="rModeled"></div>
+      <div class="resbtns">
+        <button class="shareb" id="shareBtn">Share result</button>
+        <button class="ghostb" id="againBtn">Practice run</button>
+      </div>
+      <div class="resbtns">
+        <button class="ghostb" id="resStatsBtn">Your stats</button>
+        <button class="ghostb" id="resBoardBtn">Leaderboard</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== STATS SCREEN ===== -->
+  <section id="screen_stats" class="screen hidden" aria-label="Your stats">
+    <div class="panel">
+      <h2>Your career</h2>
+      <div class="statgrid">
+        <div class="scard"><div class="n" id="st_played">0</div><div class="l">Played</div></div>
+        <div class="scard"><div class="n" id="st_streak">0</div><div class="l">Streak</div></div>
+        <div class="scard"><div class="n" id="st_max">0</div><div class="l">Best streak</div></div>
+        <div class="scard"><div class="n" id="st_winrate">0%</div><div class="l">Win rate</div></div>
+        <div class="scard"><div class="n" id="st_best">0</div><div class="l">Best bank</div></div>
+        <div class="scard"><div class="n" id="st_jackpots">0</div><div class="l">Clean days</div></div>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>Where you get off</h2>
+      <div class="distrib" id="st_distrib"></div>
+    </div>
+    <div class="backrow"><button class="ghostb" id="statsBack" style="flex:1;padding:13px;border-radius:10px">Back to the race</button></div>
+  </section>
+
+  <!-- ===== LEADERBOARD SCREEN ===== -->
+  <section id="screen_leaderboard" class="screen hidden" aria-label="Leaderboard">
+    <div class="panel">
+      <h2>Today's leaderboard</h2>
+      <div id="lb_rows"></div>
+      <div class="rpct" id="lb_rank" style="margin-top:10px"></div>
+      <div class="rmodeled">This board is modeled, not live player data. It is stable for everyone on this race.</div>
+    </div>
+    <div class="backrow"><button class="ghostb" id="boardBack" style="flex:1;padding:13px;border-radius:10px">Back to the race</button></div>
+  </section>
+
+  <!-- ad slot -->
+  <div class="adslot" id="adslot" aria-hidden="true">Advertisement</div>
+
+  <!-- related games rail -->
+  <nav class="rail" id="rail" aria-label="More games from motorsport.com">
+    <div class="railhead">More from motorsport.com</div>
+    <div class="railgrid" id="railgrid"></div>
+  </nav>
+
+  <footer class="foot">
+    <div id="foot_persist"></div>
+    The daily seed gives everyone the identical race, so it is a fair shared puzzle. Practice runs are random and never touch your streak.
+    <div style="margin-top:10px"><span class="msword foot">motorsport.com</span></div>
+  </footer>
+</div>
+
+<!-- ===== HELP MODAL ===== -->
+<div class="mback" id="help" role="dialog" aria-modal="true" aria-label="How to play">
+  <div class="mbox">
+    <div class="wl">THE <em>BIG</em> ONE</div>
+    <div class="wh">Push your luck on the high banks</div>
+    <ul class="wlist">
+      <li>You are running up front on a superspeedway. The big number is the points you would lock in if you pit right now.</li>
+      <li>Every round you <b>stay out</b>, that number can climb. Better track position and stage points are worth real points.</li>
+      <li>But the <b>Big One</b> is coming. Somewhere in the danger window, a multi car wreck collects everyone still hanging it out, and it craters your finish.</li>
+      <li>Read the <b>danger meter</b>. The mark on the bar is the smart bail line. Pit before the window and you keep every point.</li>
+      <li>Here is the edge: if you survive the window, the meter <b>falls</b>. The pack thins, the track opens, and a brave driver can push to the front for a much bigger finish. The last lap spikes again, so going for the win is its own gamble.</li>
+      <li>Set your posture to gain spots or play it safe. <b>Beat the target</b> to keep your streak. The big scores belong to whoever reads the window best.</li>
+    </ul>
+    <button class="wcta" id="helpClose">Drop the green</button>
+  </div>
+</div>
+
+<!-- ===== MODE MENU ===== -->
+<div class="mback" id="modeMenu" role="dialog" aria-modal="true" aria-label="Game modes">
+  <div class="mbox">
+    <div class="wl" style="font-size:24px;margin-bottom:14px">Choose a mode</div>
+    <div class="modelist">
+      <button class="modeopt" data-mode="daily"><span class="mi">Daily</span><span><span class="mt">Today's race</span><span class="md">One scored race a day. Same for everyone.</span></span></button>
+      <button class="modeopt" data-mode="weekly"><span class="mi">Weekly</span><span><span class="mt">Weekly challenge</span><span class="md">A tougher target on the wildest track. Talladega.</span></span></button>
+      <button class="modeopt" data-mode="practice"><span class="mi">Free</span><span><span class="mt">Practice run</span><span class="md">A random race. Never touches your streak.</span></span></button>
+    </div>
+    <div class="railhead" style="margin-top:6px">Replays</div>
+    <div class="modelist" id="replayList"></div>
+    <div class="replaynote">Replays use modeled caution timelines, not real race history. See the docs at handoff.</div>
+    <button class="mclose" id="modeClose">Close</button>
+  </div>
+</div>
+
+<!-- ===== SHARE FALLBACK ===== -->
+<div class="mback" id="shareFallback" role="dialog" aria-modal="true" aria-label="Copy your result">
+  <div class="mbox">
+    <div class="wl" style="font-size:24px;margin-bottom:14px">Copy your result</div>
+    <textarea id="shareText" readonly rows="6" style="width:100%;background:var(--panel2);color:var(--text);border:1px solid var(--line2);border-radius:10px;padding:12px;font-family:var(--body);font-size:13px"></textarea>
+    <button class="mclose" id="shareFbClose" onclick="document.getElementById('shareFallback').classList.remove('on')">Done</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="sr-only" id="live" aria-live="polite" role="status"></div>
+
+<script type="module">
+/* The Big One. Built from modular source by build.mjs. */
+"use strict";
+
+/* ===== module: src/rng.js ===== */
+/* ============================================================
+   rng.js  -  deterministic randomness
+   The whole game is reproducible from a seed string. A given
+   date produces the identical race for every player, and a
+   shared result can be rebuilt from the seed alone.
+   ============================================================ */
+
+/* xfnv1a string hash -> 32 bit unsigned seed */
+function hashSeed(str) {
+  let h = 2166136261 >>> 0;
+  const s = String(str);
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return h >>> 0;
+}
+
+/* mulberry32: small fast deterministic generator */
+function mulberry32(a) {
+  let t = a >>> 0;
+  return function () {
+    t = (t + 0x6d2b79f5) | 0;
+    let x = Math.imul(t ^ (t >>> 15), 1 | t);
+    x = (x + Math.imul(x ^ (x >>> 7), 61 | x)) ^ x;
+    return ((x ^ (x >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/* A seeded generator with independent named streams so one
+   subsystem (say caution placement) never correlates with
+   another (say lap to lap drift). Each stream is its own
+   mulberry32 seeded from the base seed mixed with the name. */
+function makeRng(seedInput) {
+  const base = typeof seedInput === "number" ? seedInput >>> 0 : hashSeed(seedInput);
+  const streams = new Map();
+  function stream(name) {
+    if (!streams.has(name)) {
+      streams.set(name, mulberry32(hashSeed(base + ":" + name)));
+    }
+    return streams.get(name);
+  }
+  const main = mulberry32(base);
+  return {
+    base,
+    next: main,                 // the default stream
+    stream,                     // get a named sub stream (a function returning 0..1)
+    float: (s, lo, hi) => lo + stream(s)() * (hi - lo),
+    int: (s, lo, hi) => Math.floor(lo + stream(s)() * (hi - lo + 1)),
+    chance: (s, p) => stream(s)() < p,
+    pick: (s, arr) => arr[Math.floor(stream(s)() * arr.length)],
+  };
+}
+
+/* Gaussian-ish via two uniforms, used for soft drift. Deterministic
+   because it pulls from the supplied stream function. */
+function gauss(streamFn) {
+  let u = 0, v = 0;
+  while (u === 0) u = streamFn();
+  while (v === 0) v = streamFn();
+  return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+}
+
+
+/* ===== module: src/points.js ===== */
+/* ============================================================
+   points.js  -  the real NASCAR Cup points economy
+   Source: the 2017 to present Cup scale (verified):
+     Win = 40, 2nd = 35, 3rd = 34, 4th = 33 ... down by one,
+     35th = 2, 36th to 40th = 1. Stage points: top ten only,
+     1st = 10 down to 10th = 1.
+   See DATA-SWAP.md for the one contested 2026 figure that is
+   flagged for confirmation against the official rulebook.
+   ============================================================ */
+
+const FIELD_SIZE = 40;
+
+/* Race finishing points for a finishing position (1 = win). */
+function finishPoints(pos) {
+  const p = Math.round(pos);
+  if (p <= 0) return 40;
+  if (p === 1) return 40;
+  if (p >= 36) return 1;
+  return 37 - p;          // 2nd = 35, 3rd = 34 ... 35th = 2
+}
+
+/* Stage points for a stage finishing position. Top ten only. */
+function stagePoints(stagePos) {
+  const p = Math.round(stagePos);
+  if (p >= 1 && p <= 10) return 11 - p;   // 1st = 10 ... 10th = 1
+  return 0;
+}
+
+/* Best possible single race haul, used as a reference ceiling:
+   win plus both stage wins = 40 + 10 + 10. */
+const MAX_RACE_POINTS = finishPoints(1) + stagePoints(1) * 2;
+
+/* A clean reference benchmark used in result copy: a strong
+   superspeedway points day is a win class finish plus stage points. */
+function benchmarkLabel(total) {
+  if (total >= 55) return "Win and both stages";
+  if (total >= 45) return "Front running day";
+  if (total >= 32) return "Solid points day";
+  if (total >= 20) return "Quiet day";
+  return "Tough day";
+}
+
+
+/* ===== module: src/tracks.js ===== */
+/* ============================================================
+   tracks.js  -  real superspeedway profiles
+   Length, banking and type are real, stable facts. They are
+   still listed in DATA-SWAP.md so the production team confirms
+   them against Motorsport Stats track metadata at handoff.
+   The "feel" fields (wreck temperament, danger shaping) are the
+   game's own tuning and shape how each track plays.
+   Daytona and Talladega must wreck differently. Atlanta in its
+   current reconfigured form drafts like a plate track but races
+   tighter, so it spins more and collects a little less.
+   ============================================================ */
+
+const TRACKS = {
+  daytona: {
+    id: "daytona",
+    name: "Daytona",
+    full: "Daytona International Speedway",
+    lengthMi: 2.5,        // real
+    bankingDeg: 31,       // real (turns)
+    type: "Superspeedway",
+    raceLaps: 200,        // Daytona 500 distance (500 mi / 2.5)
+    rounds: 20,           // decision rounds across the race
+    // feel
+    bigOneProb: 0.80,     // chance the day has at least one Big One
+    multiBigProb: 0.22,   // chance of a second Big One
+    minorMean: 1.8,       // expected single car spins
+    neutralMean: 1.1,     // expected debris / competition cautions
+    wreckClustering: 0.55,// how hard wrecks pull toward stage ends and the finish
+    salvagePos: 31,       // where a collected car typically classifies
+    blurb: "The 500. Huge pack, big closing runs, the Big One can fall anywhere late.",
+  },
+  talladega: {
+    id: "talladega",
+    name: "Talladega",
+    full: "Talladega Superspeedway",
+    lengthMi: 2.66,       // real
+    bankingDeg: 33,       // real (turns)
+    type: "Superspeedway",
+    raceLaps: 188,        // 500 mi / 2.66
+    rounds: 19,
+    bigOneProb: 0.88,     // the wildest plate track
+    multiBigProb: 0.34,   // multi wreck days are common here
+    minorMean: 1.5,
+    neutralMean: 1.0,
+    wreckClustering: 0.70,// wrecks cluster hard at stage ends and the run to the line
+    salvagePos: 30,
+    blurb: "The biggest pack in the sport. Three and four wide, and it usually ends in a heap.",
+  },
+  atlanta: {
+    id: "atlanta",
+    name: "Atlanta",
+    full: "Atlanta Motor Speedway",
+    lengthMi: 1.54,       // real, since the 2022 reconfiguration
+    bankingDeg: 28,       // real (turns), reconfigured
+    type: "Drafting (reconfigured)",
+    raceLaps: 260,        // 400 mi / 1.54
+    rounds: 22,
+    bigOneProb: 0.74,
+    multiBigProb: 0.18,
+    minorMean: 2.6,       // tighter quarters, more single car spins
+    neutralMean: 1.3,
+    wreckClustering: 0.45,// trouble is more spread out across the run
+    salvagePos: 28,
+    blurb: "Narrow and fast since the rebuild. It drafts like a plate track but bites earlier.",
+  },
+};
+
+const TRACK_IDS = Object.keys(TRACKS);
+
+function getTrack(id) {
+  return TRACKS[id] || TRACKS.daytona;
+}
+
+
+/* ===== module: src/analytics.js ===== */
+/* ============================================================
+   analytics.js  -  the engagement event seam
+   Mirrors how Two Seats reports so the audience team can measure
+   the funnel. Pushes to window.dataLayer and gtag if present, and
+   always leaves a console breadcrumb in development. No personal
+   data, just the moments that matter.
+
+   Events: game_start, decision, posture_change, pit, wreck,
+   stage_points, finish, share, mode_switch, help_open.
+   ============================================================ */
+
+const DEBUG = false; // flip on locally to see events in the console
+
+function track(event, props = {}) {
+  const payload = Object.assign({ event: "bigone_" + event, ts: Date.now() }, props);
+  try {
+    if (typeof window !== "undefined") {
+      if (Array.isArray(window.dataLayer)) window.dataLayer.push(payload);
+      if (typeof window.gtag === "function") window.gtag("event", "bigone_" + event, props);
+    }
+  } catch { /* analytics must never break the game */ }
+  if (DEBUG && typeof console !== "undefined") console.log("[analytics]", payload);
+}
+
+/* Small named helpers so call sites read cleanly. */
+const analytics = {
+  gameStart: (p) => track("game_start", p),
+  decision: (p) => track("decision", p),
+  postureChange: (p) => track("posture_change", p),
+  pit: (p) => track("pit", p),
+  wreck: (p) => track("wreck", p),
+  stagePoints: (p) => track("stage_points", p),
+  finish: (p) => track("finish", p),
+  share: (p) => track("share", p),
+  modeSwitch: (p) => track("mode_switch", p),
+  helpOpen: (p) => track("help_open", p),
+};
+
+
+/* ===== module: src/sound.js ===== */
+/* ============================================================
+   sound.js  -  optional audio cues and mobile haptics
+   Off by default. A single toggle turns both on. Built on the
+   Web Audio API with short synthesized blips, so there are no
+   asset downloads. Haptics use navigator.vibrate where present.
+   Respects prefers reduced motion by staying silent unless the
+   player explicitly opts in.
+   ============================================================ */
+
+let enabled = false;
+let actx = null;
+
+function isEnabled() { return enabled; }
+
+function setEnabled(on) {
+  enabled = !!on;
+  if (enabled && !actx) {
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (AC) actx = new AC();
+    } catch { actx = null; }
+  }
+}
+
+function toggle() { setEnabled(!enabled); return enabled; }
+
+function blip(freq, durMs, type = "sine", gain = 0.06) {
+  if (!enabled || !actx) return;
+  try {
+    if (actx.state === "suspended") actx.resume();
+    const o = actx.createOscillator();
+    const g = actx.createGain();
+    o.type = type;
+    o.frequency.value = freq;
+    g.gain.value = gain;
+    o.connect(g); g.connect(actx.destination);
+    const t = actx.currentTime;
+    g.gain.setValueAtTime(gain, t);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + durMs / 1000);
+    o.start(t);
+    o.stop(t + durMs / 1000);
+  } catch { /* audio must never break the game */ }
+}
+
+function buzz(pattern) {
+  try { if (enabled && navigator.vibrate) navigator.vibrate(pattern); } catch { /* ignore */ }
+}
+
+/* named cues used by the UI */
+const sound = {
+  stay()  { blip(440, 70, "triangle"); },
+  bank()  { blip(660, 80, "sine"); buzz(10); },
+  hot()   { blip(330, 120, "sawtooth", 0.05); buzz([8, 30, 8]); },
+  pit()   { blip(540, 110, "sine"); blip(720, 120, "sine"); buzz(20); },
+  win()   { blip(523, 110, "sine"); setTimeout(() => blip(784, 160, "sine"), 110); buzz([15, 40, 15]); },
+  wreck() { blip(150, 300, "sawtooth", 0.09); buzz([40, 60, 120]); },
+  finish(){ blip(659, 120); setTimeout(() => blip(880, 200), 120); buzz([20, 40, 20, 40, 60]); },
+  click() { blip(500, 40, "square", 0.03); },
+};
+
+
+/* ===== module: src/a11y.js ===== */
+/* ============================================================
+   a11y.js  -  accessibility helpers
+   A single polite live region for state changes, a focus mover
+   for screen transitions, and a reduced motion read so the UI
+   can quiet its animations. Every interactive control in the UI
+   carries its own label; this module handles the dynamic parts.
+   ============================================================ */
+
+let liveEl = null;
+
+function initLive(el) {
+  liveEl = el;
+}
+
+/* Announce a state change to assistive tech. Clearing first makes
+   repeated identical messages re announce. */
+function announce(msg) {
+  if (!liveEl) return;
+  liveEl.textContent = "";
+  // a microtask gap so the change is detected
+  window.requestAnimationFrame(() => { liveEl.textContent = msg; });
+}
+
+/* Move focus to a screen container so keyboard and screen reader
+   users land in the right place after a transition. */
+function focusScreen(el) {
+  if (!el) return;
+  if (!el.hasAttribute("tabindex")) el.setAttribute("tabindex", "-1");
+  try { el.focus({ preventScroll: false }); } catch { el.focus(); }
+}
+
+function prefersReducedMotion() {
+  try {
+    return window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  } catch {
+    return false;
+  }
+}
+
+
+/* ===== module: src/share.js ===== */
+/* ============================================================
+   share.js  -  the result share card
+   A compact, spoiler light card in the Two Seats family style.
+   Emoji legend:
+     game state line uses one mark for the outcome
+     a short track of the run shows the danger you rode through
+       and the lap you got off (or got caught)
+   No em dashes or en dashes anywhere in the shown text.
+   ============================================================ */
+
+const MARK = {
+  win: "\u2705",       // beat the target on a pit
+  jackpot: "\uD83C\uDFC1", // rode a clean day to the finish
+  bust: "\uD83D\uDCA5",    // caught in the Big One
+  short: "\u274C",     // pitted but came up short
+};
+
+/* Build a short visual track of the run from the danger the player
+   actually rode through, one square per round up to the pit lap.
+   green calm, yellow building, orange hot, then the exit marker. */
+function dangerTrack(result) {
+  const sq = [];
+  const d = result.dangerSeen || [];
+  for (const v of d) {
+    if (v < 22) sq.push("\uD83D\uDFE9");      // green
+    else if (v < result.threshold) sq.push("\uD83D\uDFE8"); // yellow
+    else sq.push("\uD83D\uDFE7");             // orange (hot)
+  }
+  // cap the visual so it never gets unwieldy
+  let track = sq.slice(0, 12).join("");
+  if (result.kind === "wrecked") track += "\uD83D\uDCA5";
+  else if (result.kind === "finished") track += "\uD83C\uDFC1";
+  else track += "\uD83C\uDD7F\uFE0F"; // the P in a box, a clean pit stop
+  return track;
+}
+
+function buildShareText(result, ctx) {
+  const title = "THE BIG ONE";
+  const id = ctx.mode === "daily" ? ("No. " + ctx.puzzleNo)
+    : ctx.mode === "weekly" ? "Weekly"
+    : ctx.mode === "replay" ? "Replay"
+    : "Practice";
+
+  let mark;
+  if (result.kind === "finished") mark = MARK.jackpot;
+  else if (result.kind === "wrecked") mark = MARK.bust;
+  else mark = result.beat ? MARK.win : MARK.short;
+
+  const lines = [];
+  lines.push(title + " " + id);
+  lines.push(mark + " " + result.bank + " pts (target " + result.target + ")");
+  lines.push(dangerTrack(result));
+  if (result.kind === "wrecked") {
+    lines.push("Caught lap " + result.bigLap);
+  } else if (result.bigLap > 0) {
+    lines.push("Big One fell lap " + result.bigLap);
+  } else {
+    lines.push("No Big One today");
+  }
+  lines.push("motorsport.com");
+  return lines.join("\n");
+}
+
+/* Share through the native sheet if present, else copy to clipboard.
+   Returns a short status string for a toast. */
+async function shareResult(result, ctx) {
+  const text = buildShareText(result, ctx);
+  try {
+    if (navigator.share) {
+      await navigator.share({ text });
+      return "Shared";
+    }
+  } catch {
+    // user dismissed the sheet, fall through to copy
+  }
+  try {
+    if (navigator.clipboard) {
+      await navigator.clipboard.writeText(text);
+      return "Result copied";
+    }
+  } catch { /* clipboard blocked */ }
+  return text; // caller can show it as a fallback
+}
+
+
+/* ===== module: src/viz.js ===== */
+/* ============================================================
+   viz.js  -  the live pack and wreck visual
+   A top down slice of the superspeedway pack. Your car is the
+   hot orange one. As danger rises the pack draws tighter and a
+   warning haze creeps in, so the picture says the same thing the
+   meter does, in a glance. On the Big One it fills with smoke.
+   This is the one place the design spends boldness. Everything
+   it shows is already in the snapshot, so it never lies.
+   ============================================================ */
+
+const W = 520, H = 150;
+
+function car(x, y, w, h, fill, stroke, label) {
+  const r = 4;
+  let s = `<g>`;
+  s += `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${r}" ry="${r}" fill="${fill}" stroke="${stroke}" stroke-width="1.5"/>`;
+  // a little windshield line
+  s += `<rect x="${x + w * 0.18}" y="${y + h * 0.28}" width="${w * 0.64}" height="${h * 0.16}" rx="1.5" fill="rgba(0,0,0,.28)"/>`;
+  if (label) s += `<text x="${x + w / 2}" y="${y + h / 2 + 4}" font-family="Barlow Condensed,sans-serif" font-weight="700" font-size="12" fill="#0d1117" text-anchor="middle">${label}</text>`;
+  s += `</g>`;
+  return s;
+}
+
+/* Render the pack for a given snapshot. kind can be "run" | "wreck" |
+   "safe" | "finish". seedJitter keeps the field stable within a round. */
+function renderPack(snap, kind = "run", seedJitter = 0) {
+  const danger = Math.max(0, Math.min(100, snap.danger || 0));
+  const tight = danger / 100;             // 0 calm, 1 extreme
+  const haze = 0.04 + tight * 0.22;       // warning tint
+  const lanes = 3;
+  const carW = 30, carH = 16;
+  const gapX = 46 - tight * 16;           // pack compresses as danger climbs
+  const cols = 6;
+
+  const startX = 26;
+  const laneY = [34, 67, 100];
+
+  let cars = "";
+  // a simple deterministic-ish jitter so the pack feels alive but stable
+  const jit = (i) => (Math.sin((i + 1) * 12.9898 + seedJitter * 78.233) * 43758.5453 % 1);
+
+  let idx = 0;
+  const playerCol = Math.min(cols - 1, Math.floor((snap.pos - 1) / lanes));
+  const playerLane = (snap.pos - 1) % lanes;
+
+  for (let c = 0; c < cols; c++) {
+    for (let l = 0; l < lanes; l++) {
+      const isPlayer = (c === playerCol && l === playerLane);
+      const wobble = (jit(idx) - 0.5) * (2 + tight * 5);
+      const x = startX + c * gapX;
+      const y = laneY[l] + wobble - carH / 2;
+      if (isPlayer) {
+        cars += car(x, y, carW + 2, carH + 1, "var(--hot)", "#ffd0ad", "P" + snap.pos);
+      } else {
+        const shade = c % 2 ? "#3a4554" : "#48556699";
+        cars += car(x, y, carW, carH, shade, "#5c6776", "");
+      }
+      idx++;
+    }
+  }
+
+  // motion streaks behind the pack
+  let streaks = "";
+  for (let i = 0; i < 5; i++) {
+    const y = 20 + i * 26;
+    streaks += `<line x1="0" y1="${y}" x2="${18 + tight * 20}" y2="${y}" stroke="#222c38" stroke-width="2"/>`;
+  }
+
+  // warning haze rectangle that intensifies with danger
+  const hazeColor = danger >= 82 ? "255,93,108" : danger >= 62 ? "255,122,60" : danger >= 22 ? "242,229,0" : "55,217,154";
+  const hazeRect = `<rect x="0" y="0" width="${W}" height="${H}" fill="rgba(${hazeColor},${haze.toFixed(3)})"/>`;
+
+  let overlay = "";
+  if (kind === "wreck") {
+    // smoke puffs across the pack
+    for (let i = 0; i < 7; i++) {
+      const cx = 60 + i * 64 + (jit(i) - 0.5) * 30;
+      const cy = 60 + (jit(i + 9) - 0.5) * 50;
+      const rr = 22 + jit(i + 3) * 16;
+      overlay += `<circle class="smoke" style="animation-delay:${(i * 0.06).toFixed(2)}s" cx="${cx}" cy="${cy}" r="${rr}" fill="rgba(220,224,230,.55)"/>`;
+    }
+    overlay += `<text x="${W / 2}" y="${H / 2 + 6}" font-family="Barlow Condensed,sans-serif" font-weight="700" font-size="30" letter-spacing="2" fill="var(--red)" text-anchor="middle">THE BIG ONE</text>`;
+  } else if (kind === "finish") {
+    overlay += `<rect x="0" y="0" width="${W}" height="${H}" fill="rgba(55,217,154,.10)"/>`;
+    overlay += `<text x="${W / 2}" y="${H / 2 + 6}" font-family="Barlow Condensed,sans-serif" font-weight="700" font-size="26" letter-spacing="2" fill="var(--green)" text-anchor="middle">CHECKERED FLAG</text>`;
+  } else if (kind === "safe") {
+    overlay += `<text x="${W / 2}" y="${H - 12}" font-family="Barlow Condensed,sans-serif" font-weight="700" font-size="15" letter-spacing="1.5" fill="var(--green)" text-anchor="middle">PITTED. SAFE.</text>`;
+  }
+
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Pack running position P${snap.pos}, wreck danger ${danger} percent" xmlns="http://www.w3.org/2000/svg">
+    <rect x="0" y="0" width="${W}" height="${H}" fill="#0c1218"/>
+    ${streaks}
+    ${cars}
+    ${hazeRect}
+    ${overlay}
+  </svg>`;
+}
+
+
+/* ===== module: src/cautions.js ===== */
+/* ============================================================
+   cautions.js  -  the caution map and the honest danger curve
+   Three incident kinds:
+     minor   single car spin. Small cost, mostly track position.
+     neutral debris or a competition caution. Resets the field
+             and the danger clock. A free pit window.
+     big     the Big One. Collects everyone still hanging it out.
+   Fairness contract:
+     1. The danger meter only ever measures Big One risk.
+     2. The danger array is built first and is honest.
+     3. The Big One lap is then sampled only inside rounds whose
+        meter already reads high, so a wreck in the calm zone is
+        impossible and getting caught is always greed.
+     4. Neutral cautions reset the danger clock, so a race is a
+        minefield, not one bullet.
+   ============================================================ */
+
+
+const BIG_THRESHOLD = 62;     // meter must read at least this to host a Big One.
+                              // This equals the sensible bail line in engine.js, so
+                              // a player who pits when the meter turns Hot is always
+                              // safe and getting caught is always greed.
+const CALM_CAP = 10;          // danger is capped this low in the opening quarter
+
+const MINOR_REASONS = [
+  "Single car spin off turn two",
+  "Got loose and spun alone",
+  "Brushed the wall by himself",
+  "Slid up into the marbles",
+  "Checked up and spun",
+];
+const NEUTRAL_REASONS = [
+  "Debris on the backstretch",
+  "Competition caution",
+  "Fluid down in turn three",
+  "Debris reported in turn one",
+];
+const BIG_REASONS = [
+  "THE BIG ONE",
+  "The Big One erupts off turn four",
+  "Multi car wreck stacks up the pack",
+  "It all comes apart down the back",
+];
+
+function poissonish(streamFn, mean, max) {
+  const v = mean + gauss(streamFn) * Math.max(0.5, mean * 0.45);
+  return Math.max(0, Math.min(max, Math.round(v)));
+}
+
+/* Build the per round danger array (0..100). The shape is the heart of the
+   skill in the game:
+     1. a calm opening quarter (capped),
+     2. a rising edge into the primary Big One window,
+     3. a sharp PEAK where the Big One falls if it falls,
+     4. a falloff into a REWARD VALLEY: the field has thinned, the track has
+        opened, and a brave driver who survived the peak can push to the front,
+     5. a CLOSING SPIKE on the run to the line, so going for the win is a real
+        gamble, not a free move.
+   The meter stays perfectly honest about Big One risk. What it does NOT tell
+   you is how much opportunity sits on the far side of the peak, which is what
+   makes "stay one more lap" a genuine decision rather than a solved one.
+   Neutral resets deepen the valley but never touch the closing spike. */
+function computeDanger(R, stageEndRounds, clustering, neutralRounds, peakP) {
+  const danger = new Array(R).fill(0);
+  const RISE = 0.13;          // how gradually danger climbs into the peak
+  const FALL = 0.085;         // a faster fall, so the valley reads clearly
+  const PEAK_H = 1.06;        // peak height, clears Extreme at the very top
+  const CLOSE_FROM = 0.86;    // the closing spike begins here
+  const closeH = 0.66 + ((peakP * 1000) % 1) * 0.12;  // closing level, 66..78
+
+  for (let r = 0; r < R; r++) {
+    const progress = R > 1 ? r / (R - 1) : 1;
+
+    // 1) the primary Big One window: an asymmetric bump, slow up, quick down
+    const sig = progress < peakP ? RISE : FALL;
+    let primary = PEAK_H * Math.exp(-((progress - peakP) ** 2) / (2 * sig * sig));
+
+    // neutral cautions reset the danger clock, deepening the valley
+    for (const k of neutralRounds) {
+      if (r > k) primary -= 0.55 * Math.exp(-(r - k) / 3);
+    }
+    primary = clamp01(primary);
+
+    // 2) the closing spike on the run to the line (not touched by resets)
+    let closing = 0;
+    if (progress >= CLOSE_FROM) {
+      const t = (progress - CLOSE_FROM) / (1 - CLOSE_FROM);
+      closing = closeH * (t * t * (3 - 2 * t));   // smoothstep up to the flag
+    }
+
+    let v = Math.max(primary, closing);
+    if (progress < 0.25) v = Math.min(v, CALM_CAP / 100);   // guarantee a calm zone
+    danger[r] = Math.round(v * 100);
+  }
+  return danger;
+}
+
+/* Place 0..2 Big Ones, gated strictly by the danger array. */
+function placeBigOnes(rng, track, R, danger) {
+  const out = [];
+  if (!rng.chance("hasbig", track.bigOneProb)) return out;
+
+  const eligible = [];
+  for (let r = 0; r < R; r++) {
+    const progress = R > 1 ? r / (R - 1) : 1;
+    if (danger[r] >= BIG_THRESHOLD && progress >= 0.5) {
+      eligible.push(r);
+    }
+  }
+  if (!eligible.length) return out;
+
+  const weighted = (exclude) => {
+    const pool = eligible.filter((r) => !exclude.some((e) => Math.abs(e - r) < 2));
+    if (!pool.length) return -1;
+    const weights = pool.map((r) => Math.pow(danger[r] - BIG_THRESHOLD + 1, 1.3));
+    const total = weights.reduce((a, b) => a + b, 0);
+    let t = rng.stream("place")() * total;
+    for (let i = 0; i < pool.length; i++) {
+      t -= weights[i];
+      if (t <= 0) return pool[i];
+    }
+    return pool[pool.length - 1];
+  };
+
+  const first = weighted([]);
+  if (first >= 0) out.push(first);
+  if (out.length && rng.chance("multibig", track.multiBigProb)) {
+    const second = weighted(out);
+    if (second >= 0) out.push(second);
+  }
+  return out.sort((a, b) => a - b);
+}
+
+function lapOfRound(r, R, raceLaps) {
+  return Math.max(1, Math.min(raceLaps, Math.round(((r + 1) / R) * raceLaps)));
+}
+
+/* The full deterministic caution map for a race. */
+function buildCautionMap(rng, track, R, stageEndRounds) {
+  // neutral cautions first so their resets shape the danger curve
+  const neutralCount = poissonish(rng.stream("neutralN"), track.neutralMean, 3);
+  const neutralRounds = [];
+  for (let i = 0; i < neutralCount; i++) {
+    // biased toward a stage end or the middle, never the last two rounds
+    const base = rng.chance("neutralWhere", 0.5)
+      ? rng.pick("neutralStage", stageEndRounds)
+      : Math.round(R * (0.30 + rng.stream("neutralMid")() * 0.45));
+    const r = Math.max(1, Math.min(R - 3, base + rng.int("neutralJit", -1, 1)));
+    if (!neutralRounds.includes(r)) neutralRounds.push(r);
+  }
+  neutralRounds.sort((a, b) => a - b);
+
+  // Where the Big One window peaks varies day to day, so the player reads THIS
+  // race rather than memorizing a round number. Higher clustering tracks peak
+  // later, leaving less clean air on the far side. The seed jitters it.
+  const peakP = clamp(
+    0.60 + track.wreckClustering * 0.12 + (rng.float("peak", -0.08, 0.12)),
+    0.55, 0.82
+  );
+
+  const danger = computeDanger(R, stageEndRounds, track.wreckClustering, neutralRounds, peakP);
+  const bigRounds = placeBigOnes(rng, track, R, danger);
+  const peakRound = Math.round(peakP * (R - 1));
+
+  // minor incidents anywhere, slight bias to the middle, off the big rounds
+  const minorCount = poissonish(rng.stream("minorN"), track.minorMean, 4);
+  const minorRounds = [];
+  for (let i = 0; i < minorCount; i++) {
+    const r = Math.max(0, Math.min(R - 2, Math.round(R * (0.15 + rng.stream("minorWhere")() * 0.7))));
+    if (!bigRounds.includes(r) && !minorRounds.includes(r)) minorRounds.push(r);
+  }
+  minorRounds.sort((a, b) => a - b);
+
+  const cautions = [];
+  const bigCars = () => rng.int("bigcars", track.id === "talladega" ? 11 : 8, track.id === "talladega" ? 22 : 18);
+  for (const r of bigRounds) {
+    cautions.push({
+      round: r, lap: lapOfRound(r, R, track.raceLaps), type: "big",
+      reason: rng.pick("bigreason", BIG_REASONS), cars: bigCars(), severity: 1,
+    });
+  }
+  for (const r of neutralRounds) {
+    cautions.push({
+      round: r, lap: lapOfRound(r, R, track.raceLaps), type: "neutral",
+      reason: rng.pick("neutralreason", NEUTRAL_REASONS), cars: 0, severity: 0,
+    });
+  }
+  for (const r of minorRounds) {
+    cautions.push({
+      round: r, lap: lapOfRound(r, R, track.raceLaps), type: "minor",
+      reason: rng.pick("minorreason", MINOR_REASONS), cars: 1, severity: 0.3,
+    });
+  }
+  cautions.sort((a, b) => a.round - b.round || (a.type === "big" ? -1 : 1));
+
+  return {
+    danger,
+    cautions,
+    bigRounds,
+    threshold: BIG_THRESHOLD,
+    firstBigRound: bigRounds.length ? bigRounds[0] : -1,
+    peakRound,
+  };
+}
+
+function clamp01(x) { return x < 0 ? 0 : x > 1 ? 1 : x; }
+function clamp(x, lo, hi) { return x < lo ? lo : x > hi ? hi : x; }
+
+const DANGER = { BIG_THRESHOLD, CALM_CAP };
+
+
+/* ===== module: src/calendar.js ===== */
+/* ============================================================
+   calendar.js  -  dates, seeds, rotation and the replay catalog
+   Determinism contract: a given date produces the exact same
+   race for everyone, and a shared result rebuilds from the seed.
+   ============================================================ */
+
+
+const DATA_VERSION = "bigone-2026.06";
+const DAY0 = Date.UTC(2026, 5, 18);   // launch day, puzzle No. 1
+
+function puzzleNo(now = Date.now()) {
+  return Math.floor((now - DAY0) / 864e5) + 1;
+}
+
+function isoWeek(now = Date.now()) {
+  const d = new Date(now);
+  const day = (d.getUTCDay() + 6) % 7;
+  d.setUTCDate(d.getUTCDate() - day + 3);
+  const firstThu = new Date(Date.UTC(d.getUTCFullYear(), 0, 4));
+  const week = 1 + Math.round(((d - firstThu) / 864e5 - 3 + ((firstThu.getUTCDay() + 6) % 7)) / 7);
+  return d.getUTCFullYear() + "-W" + String(week).padStart(2, "0");
+}
+
+/* The track for a given daily. Rotates across the three plate tracks
+   so the game feels different day to day. */
+function dailyTrack(no) {
+  return TRACK_IDS[(no - 1) % TRACK_IDS.length];
+}
+
+function dailySeed(no) {
+  return DATA_VERSION + ":daily:" + no;
+}
+
+function practiceSeed() {
+  return DATA_VERSION + ":practice:" + Date.now() + ":" + Math.floor(Math.random() * 1e9);
+}
+
+function weeklySeed(now = Date.now()) {
+  return DATA_VERSION + ":weekly:" + isoWeek(now);
+}
+
+function weeklyTrack(now = Date.now()) {
+  // hardest track of the rotation for the weekly challenge
+  return "talladega";
+}
+
+/* Replay catalog. These are real plate races by name and venue, but the
+   lap by lap caution timeline below is a MODELED placeholder and is flagged
+   in DATA-SWAP.md. At handoff each entry loads its real caution timeline,
+   results and points from Motorsport Stats and stops being synthetic.
+   We do not present any of these modeled numbers as real history. */
+const REPLAY_CATALOG = [
+  { id: "r-day-classic", name: "Daytona Classic", trackId: "daytona",
+    note: "A wild last lap finish at the 500. Modeled timeline pending data swap." },
+  { id: "r-dega-wild", name: "Talladega Wild Card", trackId: "talladega",
+    note: "Three and four wide all day. Modeled timeline pending data swap." },
+  { id: "r-atl-reborn", name: "Atlanta Reborn", trackId: "atlanta",
+    note: "The reconfigured pack race. Modeled timeline pending data swap." },
+];
+
+function replaySeed(id) {
+  return DATA_VERSION + ":replay:" + id;
+}
+
+
+/* ===== module: src/state.js ===== */
+/* ============================================================
+   state.js  -  persistence, career meta, and the seeded
+   synthetic distribution used for percentiles and the board.
+
+   Storage shim: the embed wants localStorage. Some sandboxes
+   (and the in app artifact preview) forbid it and throw on
+   access. We try localStorage once, and on any failure we fall
+   back to an in memory store so the game never breaks. State
+   simply does not persist across reloads in that fallback mode,
+   which is the correct, quiet degradation.
+
+   The pit lap distribution and the leaderboard are MODELED.
+   They are produced by a seeded generator so every player sees
+   the same comparison for a given puzzle, but they are not real
+   crowd data. Both are flagged in DATA-SWAP.md. At handoff they
+   read from the shared results store, and the synthetic
+   generator is removed.
+   ============================================================ */
+
+
+const KEY = "bigone_v1";
+
+function makeStorage() {
+  try {
+    const k = "__bigone_probe__";
+    localStorage.setItem(k, "1");
+    localStorage.removeItem(k);
+    return {
+      kind: "local",
+      get(key) { try { return localStorage.getItem(key); } catch { return null; } },
+      set(key, v) { try { localStorage.setItem(key, v); } catch { /* quota or blocked */ } },
+    };
+  } catch {
+    const mem = new Map();
+    return {
+      kind: "memory",
+      get(key) { return mem.has(key) ? mem.get(key) : null; },
+      set(key, v) { mem.set(key, v); },
+    };
+  }
+}
+
+const storage = makeStorage();
+
+function fresh() {
+  return {
+    seen: 0,
+    streak: 0,
+    maxStreak: 0,
+    played: 0,
+    wins: 0,         // beat the target
+    busts: 0,        // caught in the Big One
+    jackpots: 0,     // rode a clean day to the finish
+    bestBank: 0,
+    totalBank: 0,
+    pitRounds: {},   // histogram: round index -> count, the player's own habit
+    lastDaily: null, // puzzle number of the last scored daily
+    lastResult: null,// the stored result object for that daily (for the lock screen)
+    weeklyDone: null,// week id of the last scored weekly
+    weeklyBest: 0,
+  };
+}
+
+function loadState() {
+  const raw = storage.get(KEY);
+  if (!raw) return fresh();
+  try {
+    return Object.assign(fresh(), JSON.parse(raw));
+  } catch {
+    return fresh();
+  }
+}
+
+function saveState(s) {
+  storage.set(KEY, JSON.stringify(s));
+}
+
+function storageMode() {
+  return storage.kind; // "local" or "memory"
+}
+
+/* Has the player already played and scored today's daily? */
+function dailyLocked(s, puzzleNo) {
+  return s.lastDaily === puzzleNo && !!s.lastResult;
+}
+
+/* Record a finished run. Only the daily and weekly touch career meta.
+   Practice and replay never do. Returns the updated state. */
+function commitResult(s, ctx, result) {
+  const { mode, puzzleNo, weekId } = ctx;
+  if (mode === "daily") {
+    if (s.lastDaily === puzzleNo) return s; // already scored, never double count
+    s.lastDaily = puzzleNo;
+    s.lastResult = result;
+    s.played += 1;
+    s.totalBank += result.bank;
+    if (result.beat) { s.streak += 1; s.wins += 1; }
+    else s.streak = 0;
+    if (s.streak > s.maxStreak) s.maxStreak = s.streak;
+    if (result.kind === "wrecked") s.busts += 1;
+    if (result.kind === "finished") s.jackpots += 1;
+    if (result.bank > s.bestBank) s.bestBank = result.bank;
+    const pr = result.pitRound;
+    if (pr != null) s.pitRounds[pr] = (s.pitRounds[pr] || 0) + 1;
+    saveState(s);
+  } else if (mode === "weekly") {
+    if (s.weeklyDone === weekId) return s;
+    s.weeklyDone = weekId;
+    if (result.bank > s.weeklyBest) s.weeklyBest = result.bank;
+    saveState(s);
+  }
+  return s;
+}
+
+function winRate(s) {
+  return s.played > 0 ? Math.round((s.wins / s.played) * 100) : 0;
+}
+
+/* ----- modeled crowd comparison -------------------------------
+   Seeded so it is stable per puzzle and identical for everyone,
+   but it is not real data. Flagged in DATA-SWAP.md. */
+
+/* A modeled distribution of where the crowd pitted, as counts per
+   round. Centered a little before the danger turning Hot, with a
+   spread, plus a tail that rode it out. Deterministic from seed. */
+function modeledPitDistribution(seedStr, race) {
+  const rng = mulberry32(hashSeed(seedStr + ":dist"));
+  const R = race.R;
+  const counts = new Array(R + 1).fill(0); // index R == rode to the finish
+  // find the round the meter first turns Hot, the natural bail point
+  let hot = race.danger.findIndex((d) => d >= race.threshold);
+  if (hot < 0) hot = R; // never turned Hot, a clean day
+  const center = Math.max(1, hot - 1);
+  const N = 1000;
+  for (let i = 0; i < N; i++) {
+    // a rounded normal-ish draw around the bail point
+    const g = (rng() + rng() + rng() - 1.5) * 2.2;
+    let r = Math.round(center + g);
+    // a brave tail that stays out past Hot, some of whom get collected
+    if (rng() < 0.13) r = Math.min(R, hot + 1 + Math.floor(rng() * 3));
+    r = Math.max(0, Math.min(R, r));
+    counts[r] += 1;
+  }
+  return { counts, total: N, hotRound: hot };
+}
+
+/* Percentile of a pit round against the modeled crowd: the share of
+   players who pitted earlier than this round. Returns 0..100. */
+function pitPercentile(dist, pitRound) {
+  if (pitRound == null) return null;
+  let earlier = 0;
+  for (let r = 0; r < pitRound; r++) earlier += dist.counts[r];
+  return Math.round((earlier / dist.total) * 100);
+}
+
+/* A modeled leaderboard for a daily or weekly. Seeded handles, seeded
+   banks shaped around the target. Stable per seed, not real. The
+   player is inserted at their real bank so their rank is honest
+   relative to the modeled field. */
+const HANDLES = [
+  "PackRunner", "HighLine", "Drafty", "BumpDraft", "PushToPass", "TopLane",
+  "LapDown", "TheOutside", "Sidedraft", "BlockParty", "FreightTrain",
+  "RunItHard", "SaveFuel", "CleanAir", "HookSlide", "BigSpring", "PlateKing",
+  "TandemUp", "LastLap", "GreenWhite", "Checkers", "InsideLine", "PitWall",
+];
+
+function modeledLeaderboard(seedStr, target, playerBank, playerName = "You") {
+  const rng = mulberry32(hashSeed(seedStr + ":board"));
+  const n = 12;
+  const rows = [];
+  const used = new Set();
+  for (let i = 0; i < n; i++) {
+    let h;
+    do { h = HANDLES[Math.floor(rng() * HANDLES.length)]; } while (used.has(h) && used.size < HANDLES.length);
+    used.add(h);
+    // banks shaped around the target: most near it, a few well over, some short
+    const spread = (rng() + rng() - 1) * target * 0.5;
+    const over = rng() < 0.22 ? target * (0.3 + rng() * 0.5) : 0;
+    const bank = Math.max(2, Math.round(target + spread + over));
+    rows.push({ name: h, bank, you: false });
+  }
+  rows.push({ name: playerName, bank: playerBank, you: true });
+  rows.sort((a, b) => b.bank - a.bank || (a.you ? 1 : 0) - (b.you ? 1 : 0));
+  rows.forEach((r, i) => { r.rank = i + 1; });
+  const you = rows.find((r) => r.you);
+  return { rows, total: rows.length, yourRank: you ? you.rank : rows.length };
+}
+
+
+/* ===== module: src/engine.js ===== */
+/* ============================================================
+   engine.js  -  race builder and the run state machine
+   The hero number is "points you would lock in if you pit now":
+     real stage points already earned + projected finishing
+     points for where you would settle. Staying out raises it
+     (better finish locked, more stage points) but courts the
+     Big One, which craters your finish.
+   Everything is derived from the seed. Player choices change
+   which parts of a fixed race you are exposed to. The caution
+   map is identical for every player on a given day.
+   ============================================================ */
+
+
+const BASELINE_PIT = DANGER.BIG_THRESHOLD;   // the sensible bail line (62)
+const FINISH_TAIL = 38;                              // where an early pit classifies
+const PACK_MIN = 1, PACK_MAX = 20;                   // running position bounds up front
+
+const POSTURES = {
+  hold: { id: "hold", label: "Hold the line", bias: -0.3, exposure: 1.0, bankMul: 1.0 },
+  push: { id: "push", label: "Make a move", bias: -1.7, exposure: 1.35, bankMul: 1.15 },
+  drop: { id: "drop", label: "Drop back", bias: 1.9, exposure: 0.55, bankMul: 0.82 },
+};
+
+function clampPos(p) { return Math.max(PACK_MIN, Math.min(PACK_MAX, Math.round(p))); }
+function dword(d) { return d < 22 ? "Calm" : d < BASELINE_PIT ? "Building" : d < 82 ? "Hot" : "Extreme"; }
+
+/* ---------------- race construction ---------------- */
+
+function buildRace({ seedStr, trackId, mode = "daily", difficulty = 1 }) {
+  const track = getTrack(trackId);
+  const rng = makeRng(seedStr);
+  const R = track.rounds;
+
+  const stageEndRounds = [Math.round((R - 1) * 0.33), Math.round((R - 1) * 0.66)];
+  const map = buildCautionMap(rng, track, R, stageEndRounds);
+
+  // fixed per round draft draws, independent of player choice
+  const draft = [];
+  const driftStream = rng.stream("drift");
+  for (let r = 0; r < R; r++) draft.push(gauss(driftStream));
+
+  const startPos = rng.int("start", 8, 14);
+
+  // weekly challenge tightens the screws a little
+  const diffMul = difficulty;
+
+  const race = {
+    seedStr, mode, track, R, stageEndRounds,
+    danger: map.danger, cautions: map.cautions, bigRounds: map.bigRounds,
+    firstBigRound: map.firstBigRound, threshold: map.threshold, peakRound: map.peakRound,
+    draft, startPos, salvagePos: track.salvagePos,
+    cautionByRound: indexCautions(map.cautions),
+  };
+  // Dailies cap the target to the safe line so they are always winnable by
+  // sensible play. The weekly challenge lifts the cap on purpose, so clearing
+  // it asks the player to ride a notch past the bail line.
+  race.target = computeTarget(race, diffMul, mode !== "weekly");
+  return race;
+}
+
+function indexCautions(cautions) {
+  const m = new Map();
+  for (const c of cautions) {
+    if (!m.has(c.round)) m.set(c.round, []);
+    m.get(c.round).push(c);
+  }
+  return m;
+}
+
+function lapOf(race, r) {
+  return Math.max(1, Math.min(race.track.raceLaps, Math.round(((r + 1) / race.R) * race.track.raceLaps)));
+}
+
+/* ---------------- pure scoring helpers ---------------- */
+
+/* settle position if you pit at round r running position pos */
+function settleIfPit(race, r, pos) {
+  const remaining = race.R > 1 ? (race.R - 1 - r) / (race.R - 1) : 0;
+  return clampSettle(Math.round(pos + remaining * (FINISH_TAIL - pos) * 0.82));
+}
+function clampSettle(p) { return Math.max(1, Math.min(FIELD_SIZE, p)); }
+
+function bankIfPit(race, state) {
+  return state.stagePts + finishPoints(settleIfPit(race, state.idx, state.pos));
+}
+
+/* ---------------- run state machine ---------------- */
+
+function createRun(race) {
+  return {
+    race,
+    idx: 0,                 // current round index (0 based)
+    pos: race.startPos,
+    posture: "hold",
+    stagePts: 0,
+    bank: 0,
+    ended: false,
+    kind: null,             // pitted | wrecked | finished
+    history: [],            // per round records for the share card
+    feed: [],
+  };
+}
+
+function snapshot(run) {
+  const race = run.race, r = Math.min(run.idx, race.R - 1);
+  const danger = race.danger[r];
+  return {
+    idx: run.idx,
+    lap: lapOf(race, r),
+    totalLaps: race.track.raceLaps,
+    pos: run.pos,
+    posture: run.posture,
+    danger,
+    dword: dword(danger),
+    stagePts: run.stagePts,
+    bankNow: bankIfPit(race, run),
+    roundsLeft: Math.max(0, race.R - run.idx),
+    nextStage: race.stageEndRounds.find((s) => s >= run.idx),
+    isStageEndNext: race.stageEndRounds.includes(run.idx),
+    finalRound: run.idx >= race.R - 1,
+    bigAhead: race.bigRounds.some((b) => b >= run.idx),
+  };
+}
+
+function setPosture(run, posture) {
+  if (run.ended || !POSTURES[posture]) return;
+  run.posture = posture;
+}
+
+/* resolve the current round under a "stay out" decision */
+function stayOut(run) {
+  if (run.ended) return { type: "noop" };
+  const race = run.race;
+  const r = run.idx;
+  const post = POSTURES[run.posture];
+  const events = [];
+  const before = bankIfPit(race, run);
+
+  // 1) caution check for this round
+  const here = race.cautionByRound.get(r) || [];
+  const big = here.find((c) => c.type === "big");
+  if (big) {
+    // a drop back posture gives a slim escape; otherwise you are collected
+    const escapeRoll = mulberryAt(race.seedStr, "escape", r) < (run.posture === "drop" ? 0.18 : 0.0);
+    if (!escapeRoll) {
+      const sp = clampSettle(race.salvagePos + Math.round(mulberryAt(race.seedStr, "salv", r) * 4 - 2));
+      run.bank = run.stagePts + finishPoints(sp);
+      run.pos = sp;
+      run.ended = true;
+      run.kind = "wrecked";
+      run.history.push({ r, lap: big.lap, tag: "big" });
+      events.push({ type: "big", lap: big.lap, reason: big.reason, cars: big.cars, salvage: run.bank });
+      return { type: "end", kind: "wrecked", events, bank: run.bank };
+    }
+    events.push({ type: "escape", lap: big.lap, reason: big.reason });
+    run.history.push({ r, lap: big.lap, tag: "escape" });
+  }
+
+  // 2) position drift from posture and the fixed draft draw
+  const noise = race.draft[r] * 1.4;
+  run.pos = clampPos(run.pos + post.bias + noise);
+
+  // 2b) the reward for surviving the peak: clean air. Past the Big One window
+  // the field has spread out and a brave driver can pick up real track
+  // position, especially after a Big One has thinned the pack. The danger
+  // meter never shows this upside, which is what makes staying a real choice.
+  const pastPeak = r >= race.peakRound;
+  const bigBehind = race.bigRounds.some((b) => b < r);
+  if (pastPeak && !run.ended) {
+    const surgeRoll = mulberryAt(race.seedStr, "surge", r);
+    // a push in clean air is the way to the front; holding gains a little;
+    // dropping back trades position for safety as always
+    let surge = 0;
+    if (run.posture === "push" && surgeRoll < 0.62) surge = 2 + Math.round(surgeRoll * 4);
+    else if (run.posture === "hold" && surgeRoll < 0.45) surge = 1 + Math.round(surgeRoll * 2);
+    if (bigBehind) surge += 2;          // the wreck cleared cars in front of you
+    if (surge > 0) {
+      run.pos = clampPos(run.pos - surge);
+      events.push({ type: "surge", lap: lapOf(race, r), pos: run.pos, gained: surge, bigBehind });
+    }
+  }
+
+  // 3) minor incident: costs track position if exposed, never wipes the bank
+  const minor = here.find((c) => c.type === "minor");
+  if (minor) {
+    const exposed = mulberryAt(race.seedStr, "minor", r) < 0.25 * post.exposure + (run.pos > 12 ? 0.15 : 0);
+    if (exposed) {
+      run.pos = clampPos(run.pos + 3 + Math.round(mulberryAt(race.seedStr, "minorlose", r) * 3));
+      events.push({ type: "minor", lap: minor.lap, reason: minor.reason, lostSpots: true });
+      run.history.push({ r, lap: minor.lap, tag: "minor" });
+    } else {
+      events.push({ type: "minor", lap: minor.lap, reason: minor.reason, lostSpots: false });
+    }
+  }
+
+  // 4) neutral caution: field bunches, danger clock resets, no loss
+  const neutral = here.find((c) => c.type === "neutral");
+  if (neutral) {
+    run.pos = clampPos(Math.min(run.pos, 12));   // pack compresses, you are back in it
+    events.push({ type: "neutral", lap: neutral.lap, reason: neutral.reason });
+    run.history.push({ r, lap: neutral.lap, tag: "neutral" });
+  }
+
+  // 5) stage points if this round is a stage end and you are still out
+  if (race.stageEndRounds.includes(r)) {
+    const gained = stagePoints(run.pos);
+    if (gained > 0) {
+      run.stagePts += gained;
+      events.push({ type: "stage", lap: lapOf(race, r), pos: run.pos, points: gained });
+    } else {
+      events.push({ type: "stage", lap: lapOf(race, r), pos: run.pos, points: 0 });
+    }
+  }
+
+  // 6) advance
+  run.idx++;
+  if (run.idx >= race.R) {
+    // took the checkered, only reachable on a day the Big One never caught you
+    run.pos = clampPos(run.pos);
+    run.bank = run.stagePts + finishPoints(run.pos);
+    run.ended = true;
+    run.kind = "finished";
+    events.push({ type: "finish", pos: run.pos, bank: run.bank });
+    return { type: "end", kind: "finished", events, bank: run.bank };
+  }
+
+  const after = bankIfPit(race, run);
+  events.push({ type: "ran", lap: lapOf(race, run.idx - 1), pos: run.pos, gained: after - before });
+  return { type: "continue", events, gained: after - before };
+}
+
+/* final round all in attempt at the win */
+function goForWin(run) {
+  if (run.ended) return { type: "noop" };
+  const race = run.race;
+  const r = run.idx;
+  const big = (race.cautionByRound.get(r) || []).find((c) => c.type === "big");
+  if (big) {
+    const sp = clampSettle(race.salvagePos);
+    run.bank = run.stagePts + finishPoints(sp);
+    run.pos = sp; run.ended = true; run.kind = "wrecked";
+    return { type: "end", kind: "wrecked", events: [{ type: "big", lap: big.lap, reason: big.reason, cars: big.cars, salvage: run.bank }], bank: run.bank };
+  }
+  // a strong, seeded shot at the front
+  const roll = mulberryAt(race.seedStr, "win", r);
+  const target = roll < 0.34 ? 1 : roll < 0.62 ? 2 : roll < 0.82 ? 3 : 5;
+  run.pos = Math.min(run.pos, target);
+  run.bank = run.stagePts + finishPoints(run.pos);
+  run.ended = true; run.kind = "finished";
+  return { type: "end", kind: "finished", events: [{ type: "finish", pos: run.pos, bank: run.bank, win: run.pos === 1 }], bank: run.bank };
+}
+
+function pit(run) {
+  if (run.ended) return { type: "noop" };
+  const race = run.race;
+  const sp = settleIfPit(race, run.idx, run.pos);
+  run.pos = sp;
+  run.bank = run.stagePts + finishPoints(sp);
+  run.ended = true;
+  run.kind = "pitted";
+  run.history.push({ r: run.idx, lap: lapOf(race, run.idx), tag: "pit" });
+  return { type: "end", kind: "pitted", bank: run.bank, settle: sp, events: [{ type: "pit", lap: lapOf(race, run.idx), bank: run.bank, settle: sp }] };
+}
+
+/* small deterministic helper used for the few per round micro rolls so a
+   replayed seed reproduces the exact run for identical choices */
+function mulberryAt(seedStr, tag, r) {
+  let h = 2166136261 >>> 0;
+  const s = seedStr + ":" + tag + ":" + r;
+  for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
+  let t = (h >>> 0) + 0x6d2b79f5;
+  t = Math.imul(t ^ (t >>> 15), 1 | t);
+  t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+  return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+}
+
+/* ---------------- target calibration ---------------- */
+
+/* A sensible player pits the moment the meter turns Hot. Simulate that
+   line on this exact race and set the target at 90 percent of it.
+   On a day the meter never turns Hot, the sensible line rides to the
+   finish, which is the jackpot. Calibration tests prove this is always
+   beatable and that no Big One sits below the bail line. */
+function computeTarget(race, diffMul = 1, cap = true) {
+  const run = createRun(race);
+  let safeBank = 0;
+  for (let r = 0; r < race.R; r++) {
+    if (race.danger[r] >= BASELINE_PIT) break;          // sensible bail point
+    stayOut(run);
+    safeBank = run.ended ? run.bank : bankIfPit(race, run);
+    if (run.ended) break;
+  }
+  if (!run.ended) safeBank = bankIfPit(race, run);
+  let t = Math.max(14, Math.round(safeBank * 0.9 * diffMul));
+  // A daily must always be winnable by the safe line, so the target can
+  // never exceed what that line banks. The weekly challenge lifts this cap
+  // on purpose, so beating it asks for a little bravery.
+  if (cap) t = Math.min(t, safeBank);
+  return t;
+}
+
+
+
+/* ===== module: src/data.js ===== */
+/* ============================================================
+   data.js  -  the single data seam the rest of the game depends on
+   Behind this seam sit two providers:
+     synthetic   the model from the prototype, used live here and
+                 for offline development.
+     live        the Motorsport Stats integration. It is a stub in
+                 this build because the data feed is not reachable
+                 from the build environment. Every place the
+                 synthetic provider stands in for real data is
+                 listed in DATA-SWAP.md.
+   Swapping providers must not require touching the game, the
+   render layer or the tests. They only call getDailyRace and
+   friends and receive a RaceSpec.
+   ============================================================ */
+
+
+/* The internal RaceSpec schema. Documented fully in SCHEMA.md.
+   The live provider must map the Motorsport Stats feed into exactly
+   this shape. */
+function asSpec(race, extra) {
+  return Object.assign({ dataVersion: DATA_VERSION, source: "synthetic", race }, extra);
+}
+
+function createSyntheticProvider() {
+  return {
+    name: "synthetic",
+    dataVersion: DATA_VERSION,
+    getDailyRace(no = puzzleNo()) {
+      const trackId = dailyTrack(no);
+      const race = buildRace({ seedStr: dailySeed(no), trackId, mode: "daily" });
+      return asSpec(race, { puzzleNo: no, mode: "daily" });
+    },
+    getPracticeRace(trackId) {
+      const id = trackId || pickRandomTrack();
+      const race = buildRace({ seedStr: practiceSeed(), trackId: id, mode: "practice" });
+      return asSpec(race, { mode: "practice" });
+    },
+    getWeeklyRace(now = Date.now()) {
+      const race = buildRace({ seedStr: weeklySeed(now), trackId: weeklyTrack(now), mode: "weekly", difficulty: 1.12 });
+      return asSpec(race, { mode: "weekly", week: weeklySeed(now) });
+    },
+    getReplayCatalog() {
+      return REPLAY_CATALOG.map((r) => ({ ...r, modeled: true }));
+    },
+    getReplayRace(id) {
+      const entry = REPLAY_CATALOG.find((r) => r.id === id) || REPLAY_CATALOG[0];
+      const race = buildRace({ seedStr: replaySeed(entry.id), trackId: entry.trackId, mode: "replay" });
+      return asSpec(race, { mode: "replay", replayId: entry.id, name: entry.name, modeled: true, note: entry.note });
+    },
+    getTrackMeta(id) {
+      return TRACKS[id] || null;
+    },
+  };
+}
+
+/* The live Motorsport Stats provider. Wiring it is the production task.
+   It must return the same RaceSpec shape so nothing else changes.
+   See SCHEMA.md for the field by field mapping. */
+function createLiveProvider(/* { apiKey, baseUrl } */) {
+  const notWired = (m) => { throw new Error("Motorsport Stats provider not wired in this build: " + m + ". See SCHEMA.md and DATA-SWAP.md."); };
+  return {
+    name: "live",
+    dataVersion: DATA_VERSION,
+    getDailyRace() { return notWired("getDailyRace"); },
+    getPracticeRace() { return notWired("getPracticeRace"); },
+    getWeeklyRace() { return notWired("getWeeklyRace"); },
+    getReplayCatalog() { return notWired("getReplayCatalog"); },
+    getReplayRace() { return notWired("getReplayRace"); },
+    getTrackMeta() { return notWired("getTrackMeta"); },
+  };
+}
+
+function pickRandomTrack() {
+  const ids = Object.keys(TRACKS);
+  return ids[Math.floor(Math.random() * ids.length)];
+}
+
+/* The seam. Flip USE_LIVE to true once the feed is wired. */
+const USE_LIVE = false;
+function createDataProvider() {
+  return USE_LIVE ? createLiveProvider() : createSyntheticProvider();
+}
+
+
+/* ===== module: src/ui.js ===== */
+/* ============================================================
+   ui.js  -  the screen layer
+   Binds the pure engine to the DOM. Holds no game rules of its
+   own; it reads snapshots, plays the events the engine returns,
+   and writes them to the dashboard, the feed, the pack visual
+   and the result card. Daily results are scored once. Practice
+   and replay never touch the streak.
+   ============================================================ */
+
+
+const $ = (id) => document.getElementById(id);
+
+let provider, state;
+let race, run, ctx;        // current RaceSpec.race, run state, and context
+let dangerSeen = [];       // danger the player rode through, for share + distribution
+let pitRound = null;       // round the player got off (or got caught / finished)
+let lastResult = null;
+let jitter = 0;
+let valleyCued = false;    // have we told the player the window passed
+
+/* ---------- mount ---------- */
+function mount() {
+  provider = createDataProvider();
+  state = loadState();
+  initLive($("live"));
+
+  // sound toggle reflects nothing persisted; default off, reduced motion safe
+  $("soundBtn").setAttribute("aria-pressed", "false");
+
+  wireHandlers();
+  renderMeta();
+  startRace("daily");
+
+  document.body.dataset.reducedMotion = String(prefersReducedMotion());
+  if (!state.seen) openHelp(true);
+}
+
+function wireHandlers() {
+  $("stayBtn").onclick = onStay;
+  $("pitBtn").onclick = onPit;
+  $("winBtn").onclick = onGoForWin;
+  for (const p of Object.keys(POSTURES)) {
+    const b = $("posture_" + p);
+    if (b) b.onclick = () => choosePosture(p);
+  }
+  $("shareBtn").onclick = doShare;
+  $("againBtn").onclick = () => startRace("practice");
+  $("resStatsBtn").onclick = () => showScreen("stats");
+  $("resBoardBtn").onclick = () => showScreen("leaderboard");
+
+  $("helpBtn").onclick = () => openHelp(false);
+  $("helpClose").onclick = closeHelp;
+  $("statsBtn").onclick = () => showScreen("stats");
+  $("modeBtn").onclick = openModeMenu;
+  $("modeClose").onclick = closeModeMenu;
+  $("soundBtn").onclick = toggleSound;
+
+  $("statsBack").onclick = () => showScreen("play");
+  $("boardBack").onclick = () => showScreen("play");
+
+  // mode options
+  document.querySelectorAll("[data-mode]").forEach((el) => {
+    el.onclick = () => {
+      const m = el.getAttribute("data-mode");
+      const rid = el.getAttribute("data-replay");
+      closeModeMenu();
+      startRace(m, rid ? { replayId: rid } : {});
+    };
+  });
+
+  // keyboard: S stay, P pit, 1/2/3 postures, W go for win
+  document.addEventListener("keydown", (e) => {
+    if (e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
+    if (anyModalOpen()) return;
+    const k = e.key.toLowerCase();
+    if (run && !run.ended) {
+      const snap = snapshot(run);
+      if (k === "s" && !snap.finalRound) { e.preventDefault(); onStay(); }
+      else if (k === "p") { e.preventDefault(); onPit(); }
+      else if (k === "w" && snap.finalRound) { e.preventDefault(); onGoForWin(); }
+      else if (k === "1") { e.preventDefault(); choosePosture("hold"); }
+      else if (k === "2") { e.preventDefault(); choosePosture("push"); }
+      else if (k === "3") { e.preventDefault(); choosePosture("drop"); }
+    }
+  });
+}
+
+/* ---------- meta / pills ---------- */
+function renderMeta() {
+  $("pNo").textContent = puzzleNo();
+  $("streakPill").textContent = state.streak;
+  if (storageMode() === "memory") {
+    $("foot_persist").textContent = "Progress is not saved in this preview. Open the page directly to keep a streak.";
+  }
+}
+
+/* ---------- start a race ---------- */
+function startRace(mode, opts = {}) {
+  let spec;
+  if (mode === "daily") spec = provider.getDailyRace();
+  else if (mode === "weekly") spec = provider.getWeeklyRace();
+  else if (mode === "replay") spec = provider.getReplayRace(opts.replayId);
+  else spec = provider.getPracticeRace(opts.trackId);
+
+  race = spec.race;
+  ctx = {
+    mode,
+    puzzleNo: spec.puzzleNo || puzzleNo(),
+    weekId: isoWeek(),
+    modeled: !!spec.modeled,
+    name: spec.name || null,
+    note: spec.note || null,
+  };
+  run = createRun(race);
+  dangerSeen = [];
+  pitRound = null;
+  lastResult = null;
+  jitter = Math.random();
+  valleyCued = false;
+
+  analytics.gameStart({ mode, track: race.track.id, target: race.target });
+
+  // mode pill + track line
+  const modeLabel = mode === "daily" ? "Daily" : mode === "weekly" ? "Weekly Challenge"
+    : mode === "replay" ? "Replay" : "Practice";
+  $("modePill").textContent = modeLabel;
+  $("modePill").className = "pill" + (mode === "weekly" ? " live" : "");
+  $("noPill").style.display = mode === "daily" ? "" : "none";
+
+  renderTrackLine();
+  resetDashboard();
+  showScreen("play");
+
+  // daily already scored today: show the locked result, no second score
+  if (mode === "daily" && dailyLocked(state, ctx.puzzleNo)) {
+    lastResult = state.lastResult;
+    showResultCard(state.lastResult, true);
+    return;
+  }
+  feed("Green flag. You settle into the draft up front.", "");
+  render();
+}
+
+function renderTrackLine() {
+  const t = race.track;
+  const note = ctx.modeled ? " Modeled race." : "";
+  $("trackline").innerHTML =
+    "<b>" + t.name + "</b> &middot; " + t.type + " &middot; Beat <b>" + race.target +
+    "</b> to " + (ctx.mode === "daily" ? "keep your streak" : "clear it") + "." + note;
+}
+
+function resetDashboard() {
+  $("dash").className = "dash";
+  $("feed").innerHTML = "";
+  $("controls").className = "controls";
+  $("controls").style.display = "grid";
+  $("postures").style.display = "grid";
+  $("winBtn").style.display = "none";
+  $("stayBtn").style.display = "";
+  setPosture(run, "hold");
+}
+
+/* ---------- render the dashboard from a snapshot ---------- */
+function render() {
+  const snap = snapshot(run);
+  $("bank").textContent = snap.bankNow;
+  $("pos").textContent = "P" + snap.pos;
+  $("laps").textContent = snap.roundsLeft;
+  $("lapNow").textContent = snap.lap;
+  $("totalLaps").textContent = snap.totalLaps;
+
+  // danger meter
+  $("dbar").style.width = snap.danger + "%";
+  $("dword").textContent = snap.dword;
+  $("dword").style.color = snap.danger < 22 ? "var(--green)"
+    : snap.danger < BASELINE_PIT ? "var(--amber)"
+    : snap.danger < 82 ? "var(--hot)" : "var(--red)";
+  // mark the bail line on the bar
+  $("dmark").style.left = BASELINE_PIT + "%";
+
+  // pack visual
+  $("pack").innerHTML = renderPack(snap, "run", jitter);
+
+  // posture buttons reflect current
+  for (const p of Object.keys(POSTURES)) {
+    const b = $("posture_" + p);
+    if (b) b.setAttribute("aria-pressed", String(run.posture === p));
+  }
+
+  // final round: swap stay for go for the win
+  if (snap.finalRound) {
+    $("stayBtn").style.display = "none";
+    $("winBtn").style.display = "";
+    $("controls").className = "controls";
+    $("postures").style.display = "none";
+    $("stayHint").textContent = "";
+  } else {
+    $("stayBtn").style.display = "";
+    $("winBtn").style.display = "none";
+  }
+}
+
+/* ---------- posture ---------- */
+function choosePosture(p) {
+  if (!run || run.ended) return;
+  const snap = snapshot(run);
+  if (snap.finalRound) return;
+  setPosture(run, p);
+  analytics.postureChange({ posture: p, round: run.idx });
+  sound.click();
+  render();
+}
+
+/* ---------- decisions ---------- */
+function onStay() {
+  if (!run || run.ended) return;
+  const snap = snapshot(run);
+  dangerSeen.push(snap.danger);
+  analytics.decision({ choice: "stay", round: run.idx, posture: run.posture, danger: snap.danger });
+  if (snap.danger >= BASELINE_PIT) sound.hot(); else sound.stay();
+
+  const before = snap.bankNow;
+  const res = stayOut(run);
+  playEvents(res.events, before);
+
+  if (run.ended) { endRun(run.kind); return; }
+  sound.bank();
+  render();
+
+  // once you are past the Big One window and the meter has eased, tell the
+  // player the track has opened up. This teaches that surviving the peak is
+  // the reward, not just the risk.
+  if (!valleyCued && run.idx > race.peakRound && !snapshot(run).finalRound) {
+    const peakDanger = race.danger[Math.min(race.peakRound, race.R - 1)];
+    if (peakDanger >= BASELINE_PIT && snapshot(run).danger < BASELINE_PIT) {
+      valleyCued = true;
+      feed("The Big One window has passed. The track opens up. This is your shot to move up.", "go");
+      announce("The danger has eased. Clean air ahead.");
+    }
+  }
+}
+
+function onPit() {
+  if (!run || run.ended) return;
+  const snap = snapshot(run);
+  pitRound = run.idx;
+  analytics.decision({ choice: "pit", round: run.idx, danger: snap.danger });
+  const res = pit(run);
+  playEvents(res.events, snap.bankNow);
+  sound.pit();
+  endRun("pitted");
+}
+
+function onGoForWin() {
+  if (!run || run.ended) return;
+  const snap = snapshot(run);
+  dangerSeen.push(snap.danger);
+  analytics.decision({ choice: "go_for_win", round: run.idx, danger: snap.danger });
+  const res = goForWin(run);
+  playEvents(res.events, snap.bankNow);
+  endRun(run.kind);
+}
+
+/* ---------- translate engine events into the feed ---------- */
+function playEvents(events, beforeBank) {
+  for (const e of events) {
+    if (e.type === "escape") {
+      feed("You drop low and slip the wreck on lap " + e.lap + ". " + e.reason, "go");
+      announce("You escaped the wreck.");
+    } else if (e.type === "big") {
+      feed("THE BIG ONE on lap " + e.lap + ". " + e.reason + " You are collected. Salvage " + e.salvage + " points.", "bad");
+    } else if (e.type === "minor") {
+      if (e.lostSpots) feed("Lap " + e.lap + ": " + e.reason + " You lose track position.", "hot");
+      else feed("Lap " + e.lap + ": " + e.reason + " You clear it.", "");
+    } else if (e.type === "neutral") {
+      feed("Lap " + e.lap + ": " + e.reason + " The field bunches and the danger resets.", "");
+    } else if (e.type === "stage") {
+      if (e.points > 0) { feed("Stage end on lap " + e.lap + ". You bank " + e.points + " stage points running P" + e.pos + ".", "stage"); sound.bank(); }
+      else feed("Stage end on lap " + e.lap + ". Outside the top ten, no stage points.", "");
+    } else if (e.type === "surge") {
+      if (e.bigBehind) feed("Lap " + e.lap + ": the wreck cleared the cars ahead. You surge to P" + e.pos + ".", "go");
+      else feed("Lap " + e.lap + ": clean air. You move up to P" + e.pos + ".", "go");
+      sound.bank();
+    } else if (e.type === "ran") {
+      const g = e.gained;
+      feed("Lap " + e.lap + ": running P" + e.pos + ". Lock in number " + (g >= 0 ? "up " + g : "down " + (-g)) + ".", g < 0 ? "hot" : "");
+    } else if (e.type === "finish") {
+      if (e.win) feed("You win the race. Maximum points.", "go");
+      else feed("Checkered flag. You finish P" + e.pos + " and survive the day.", "go");
+    } else if (e.type === "pit") {
+      feed("You peel off to pit road on lap " + e.lap + " with " + e.bank + " locked in. Safe.", "go");
+    }
+  }
+}
+
+function feed(txt, cls) {
+  const d = document.createElement("div");
+  d.className = cls;
+  d.textContent = txt;
+  $("feed").prepend(d);
+}
+
+/* ---------- end of run ---------- */
+function endRun(kind) {
+  $("controls").style.display = "none";
+  $("postures").style.display = "none";
+
+  const beat = run.bank >= race.target;
+  const bigLap = race.bigRounds.length ? lapForRound(race.firstBigRound) : -1;
+  if (pitRound == null && kind !== "pitted") pitRound = run.idx;
+
+  const result = {
+    kind, bank: run.bank, target: race.target, beat,
+    bigLap, pitRound,
+    dangerSeen: dangerSeen.slice(),
+    threshold: race.threshold,
+    pos: run.pos,
+    track: race.track.name,
+    seedStr: race.seedStr,
+  };
+  lastResult = result;
+
+  // dashboard flourish + sound
+  const snap = snapshot(run);
+  if (kind === "wrecked") { $("dash").className = "dash wreck"; $("pack").innerHTML = renderPack(snap, "wreck", jitter); sound.wreck(); announce("Caught in the Big One. Salvaged " + run.bank + " points."); }
+  else if (kind === "finished") { $("dash").className = "dash safe"; $("pack").innerHTML = renderPack(snap, "finish", jitter); sound.finish(); announce("You finished the race with " + run.bank + " points."); }
+  else { $("dash").className = "dash safe"; $("pack").innerHTML = renderPack(snap, "safe", jitter); announce("Pitted with " + run.bank + " points. " + (beat ? "Target beaten." : "Short of target.")); if (beat) sound.win(); }
+
+  // score it (daily and weekly only)
+  state = commitResult(state, ctx, result);
+  renderMeta();
+
+  analytics.finish({ mode: ctx.mode, kind, bank: run.bank, target: race.target, beat });
+  if (kind === "wrecked") analytics.wreck({ mode: ctx.mode, lap: bigLap });
+
+  showResultCard(result, false);
+}
+
+function lapForRound(r) {
+  return Math.max(1, Math.min(race.track.raceLaps, Math.round(((r + 1) / race.R) * race.track.raceLaps)));
+}
+
+/* ---------- result card ---------- */
+function showResultCard(result, locked) {
+  const tag = $("rTag"), head = $("rHead"), sub = $("rSub");
+  const beat = result.beat;
+
+  if (result.kind === "finished") {
+    tag.className = "rtag jack"; tag.textContent = "\u2605 Checkered flag";
+    head.textContent = "You went the distance";
+    sub.innerHTML = "No Big One today. You rode it to the line and banked <b>" + result.bank + "</b>. " +
+      "The target was " + result.target + ".";
+  } else if (result.kind === "wrecked") {
+    tag.className = "rtag bust"; tag.textContent = "\uD83D\uDCA5 Collected";
+    head.textContent = "Caught in the Big One";
+    sub.innerHTML = "You hung it out one move too long. The wreck fell on lap <b>" + result.bigLap +
+      "</b> and you salvaged just <b>" + result.bank + "</b>.";
+  } else {
+    tag.className = beat ? "rtag wint" : "rtag bust";
+    tag.textContent = beat ? "\u2713 Banked it" : "Short";
+    head.textContent = beat ? "Smart pit call" : "Pitted too early";
+    const wreckTxt = result.bigLap > 0
+      ? ("The Big One fell on lap " + result.bigLap + ".")
+      : "The Big One never came. There were points still out there.";
+    sub.innerHTML = "You locked in <b>" + result.bank + "</b> against a target of " + result.target + ". " + wreckTxt;
+  }
+
+  $("rBank").innerHTML = result.bank + "<span class='u'>pts</span>";
+  $("rBench").textContent = benchmarkLabel(result.bank);
+
+  // modeled percentile vs the crowd
+  const dist = modeledPitDistribution(result.seedStr, race);
+  const pct = pitPercentile(dist, result.pitRound);
+  if (pct != null && result.kind !== "finished") {
+    $("rPct").textContent = "You got off earlier than " + pct + " percent of the modeled field.";
+    $("rPct").style.display = "";
+  } else {
+    $("rPct").style.display = "none";
+  }
+  $("rModeled").textContent = ctx.modeled
+    ? "This replay uses a modeled caution timeline, not real history."
+    : "Crowd comparison is modeled, not live player data.";
+
+  // locked daily messaging
+  $("againBtn").textContent = (ctx.mode === "daily") ? "Practice run" : "New race";
+  if (locked && ctx.mode === "daily") {
+    feed("You already ran today's daily. Come back tomorrow for a new race.", "");
+  }
+
+  buildRail();
+  showScreen("result");
+}
+
+/* ---------- screens ---------- */
+function showScreen(name) {
+  for (const s of ["play", "result", "stats", "leaderboard"]) {
+    const el = $("screen_" + s);
+    if (el) el.classList.toggle("hidden", s !== name);
+  }
+  if (name === "stats") renderStats();
+  if (name === "leaderboard") renderLeaderboard();
+  const el = $("screen_" + name);
+  if (el) focusScreen(el);
+}
+
+/* ---------- stats ---------- */
+function renderStats() {
+  $("st_played").textContent = state.played;
+  $("st_streak").textContent = state.streak;
+  $("st_max").textContent = state.maxStreak;
+  $("st_winrate").textContent = winRate(state) + "%";
+  $("st_best").textContent = state.bestBank;
+  $("st_jackpots").textContent = state.jackpots;
+
+  // personal pit round habit
+  const box = $("st_distrib");
+  const pr = state.pitRounds || {};
+  const keys = Object.keys(pr).map(Number).sort((a, b) => a - b);
+  if (keys.length === 0) {
+    box.innerHTML = "<div class='rmodeled'>Play a few dailies to see where you tend to get off.</div>";
+    return;
+  }
+  const max = Math.max(...keys.map((k) => pr[k]));
+  let html = "";
+  for (const k of keys) {
+    const w = Math.round((pr[k] / max) * 100);
+    html += "<div class='drow'><span class='dk'>Round " + (k + 1) + "</span>" +
+      "<span class='dtrack'><i style='width:" + w + "%'></i></span>" +
+      "<span class='dv'>" + pr[k] + "</span></div>";
+  }
+  box.innerHTML = html;
+}
+
+/* ---------- leaderboard ---------- */
+function renderLeaderboard() {
+  const bank = lastResult ? lastResult.bank : (run ? run.bank : 0);
+  const board = modeledLeaderboard(race.seedStr, race.target, bank);
+  let html = "";
+  for (const r of board.rows) {
+    html += "<div class='lbrow" + (r.you ? " you" : "") + "'>" +
+      "<span class='rk'>" + r.rank + "</span>" +
+      "<span class='nm'>" + r.name + "</span>" +
+      "<span class='bk'>" + r.bank + "</span></div>";
+  }
+  $("lb_rows").innerHTML = html;
+  $("lb_rank").textContent = "You placed " + board.yourRank + " of " + board.total + " in the modeled field.";
+}
+
+/* ---------- related games rail ---------- */
+function buildRail() {
+  if ($("rail").dataset.built) return;
+  const games = [
+    { n: "Two Seats", d: "The F1 daily. Build a two car lineup and beat the grid.", t: "Formula 1" },
+    { n: "The Lineup", d: "Fill a NASCAR org's seats and beat the dynasty.", t: "NASCAR" },
+    { n: "The Cutline", d: "Call the playoff bracket before the cutline falls.", t: "NASCAR" },
+  ];
+  let html = "";
+  for (const g of games) {
+    html += "<a class='railcard' href='#' onclick='return false'>" +
+      "<div class='rn'>" + g.n + "</div><div class='rd'>" + g.d + "</div>" +
+      "<div class='rt'>" + g.t + "</div></a>";
+  }
+  $("railgrid").innerHTML = html;
+  $("rail").dataset.built = "1";
+}
+
+/* ---------- share ---------- */
+async function doShare() {
+  if (!lastResult) return;
+  analytics.share({ mode: ctx.mode, kind: lastResult.kind });
+  const status = await shareResult(lastResult, ctx);
+  if (status === "Shared" || status === "Result copied") toast(status);
+  else { // fallback: show the text in a toast-ish way
+    toast("Copy your result below");
+    showShareFallback(buildShareText(lastResult, ctx));
+  }
+}
+
+function showShareFallback(text) {
+  const m = $("shareFallback");
+  $("shareText").value = text;
+  m.classList.add("on");
+  $("shareText").select();
+}
+
+/* ---------- modals ---------- */
+function openHelp(first) {
+  analytics.helpOpen({ first: !!first });
+  $("help").classList.add("on");
+  if (first) { state.seen = 1; }
+}
+function closeHelp() {
+  $("help").classList.remove("on");
+  saveState(state);
+}
+function openModeMenu() { renderReplayList(); $("modeMenu").classList.add("on"); }
+function closeModeMenu() { $("modeMenu").classList.remove("on"); }
+
+function renderReplayList() {
+  if ($("replayList").dataset.built) return;
+  const cat = provider.getReplayCatalog();
+  let html = "";
+  for (const r of cat) {
+    html += "<button class='modeopt' data-mode='replay' data-replay='" + r.id + "'>" +
+      "<span class='mi'>Replay</span><span><span class='mt'>" + r.name + "</span>" +
+      "<span class='md'>" + r.note + "</span></span></button>";
+  }
+  $("replayList").innerHTML = html;
+  $("replayList").dataset.built = "1";
+  // rebind because these are new nodes
+  document.querySelectorAll("#replayList [data-mode]").forEach((el) => {
+    el.onclick = () => { closeModeMenu(); startRace("replay", { replayId: el.getAttribute("data-replay") }); };
+  });
+}
+
+function anyModalOpen() {
+  return $("help").classList.contains("on") ||
+    $("modeMenu").classList.contains("on") ||
+    $("shareFallback").classList.contains("on");
+}
+
+/* ---------- sound toggle ---------- */
+function toggleSound() {
+  const on = !isEnabled();
+  setEnabled(on);
+  $("soundBtn").setAttribute("aria-pressed", String(on));
+  $("soundBtn").textContent = on ? "Sound on" : "Sound";
+  if (on) sound.click();
+}
+
+/* ---------- toast ---------- */
+let toastTimer = null;
+function toast(m) {
+  const e = $("toast");
+  e.textContent = m;
+  e.classList.add("on");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => e.classList.remove("on"), 1600);
+}
+
+/* expose for the fallback close button and reduced motion read */
+
+
+/* boot */
+mount();
+</script>
+</body>
+</html>
